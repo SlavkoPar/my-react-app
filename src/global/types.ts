@@ -1,6 +1,5 @@
 // Define the Global State
-import { IAssignedAnswerKey, ICategory, ICategoryKey, ICategoryRow, ICategoryRowDto, IKeyExpanded, IQuestion, IQuestionEx, IQuestionKey, IQuestionRow } from 'categories/types';
-//import { IGroup, IGroupKey, IAnswerRow, IAnswer, IAnswerKey, IGroupRow, IHistoryAnswerKey } from 'groups/types';
+import type { IAssignedAnswerDtoKey, IAssignedAnswerKey, ICategory, ICategoryKey, ICategoryRow, ICategoryRowDto, IKeyExpanded, IQuestion, IQuestionDtoKey, IQuestionEx, IQuestionKey, IQuestionRow } from '../categories/types';
 //import { IOption } from 'common/types';
 
 export interface IWhoWhen {
@@ -56,12 +55,32 @@ export class WhoWhen2Dto {
 	whoWhenDto?: IWhoWhenDto = undefined;
 }
 
+export interface IChatBotAnswer {
+  questionKey?: IQuestionKey;
+  topId: string;
+  id: string;
+  answerTitle: string;
+  answerLink: string | null;
+  created: IWhoWhen,
+  modified: IWhoWhen | null
+}
+
+export interface IHistory {
+	id?: number;
+	questionKey: IQuestionKey;
+	assignedAnswerKey: IAssignedAnswerKey;
+	userAction: USER_ANSWER_ACTION; // when client didn't click on 'Fixed' or 'Not fixed' buttons
+	created?: IWhoWhen
+}
+
 
 export class HistoryDto {
-	constructor(history: IHistory) {
+	constructor(history: IHistory, Workspace: string) {
+		const { questionKey, assignedAnswerKey} = history;
 		this.historyDto = {
-			QuestionKey: history.questionKey,
-			AssignedAnswerKey: history.assignedAnswerKey,
+			Workspace, 
+			QuestionKey: { TopId: questionKey.topId, Id: questionKey.id, ParentId: questionKey.parentId },
+			AnswerKey: { TopId: assignedAnswerKey.topId, Id: assignedAnswerKey.id},
 			UserAction: history.userAction,
 			Created: new WhoWhen2Dto(history.created).whoWhenDto!,
 		}
@@ -73,15 +92,11 @@ export class HistoryDto {
 
 // export class History {
 // 	constructor(dto: IHistoryDto) {
+// 		const { QuestionKey, AnswerKey, UserAction } = dto;
 // 		this.history = {
-// 			questionKey: dto.QuestionKey,
-// 			answerKey: dto.AnswerKey,
-// 			userAction: dto.Fixed == 2
-// 				? undefined
-// 				: dto.Fixed == 1
-// 					? true
-// 					: false,
-// 			created: new Dto2WhoWhen(dto.Created!).whoWhen,
+// 			questionKey: { topId: QuestionKey.TopId, id: QuestionKey.Id, parentId: QuestionKey.ParentId },
+// 			userAction: UserAction,
+// 			assignedAnswerKey: { topId: AnswerKey.TopId, id: AnswerKey.Id }
 // 		}
 // 	}
 // 	history: IHistory;
@@ -140,7 +155,6 @@ export interface IGlobalState {
 	error?: Error;
 	allCategoryRows: Map<string, ICategoryRow>;
 	allCategoryRowsLoaded?: number;
-	nodesReLoaded: boolean; // categoryNodeLoaded || groupNodeLoaded  ( to prevent showing of ChatBotDlg)
 	lastRouteVisited: string;
 }
 
@@ -158,6 +172,34 @@ export interface IParentInfo {
 	parentId: string,
 	title?: string, // to easier follow getting the list of sub-categories
 	level: number
+}
+
+export interface IHistoryFilter {
+	Workspace?: string,
+	questionKey: IQuestionKey;
+	filter: string;
+	created: IWhoWhen
+}
+
+export interface IHistoryFilterDto {
+	Workspace?: string,
+	QuestionKey: IQuestionDtoKey;
+	Filter: string;
+	Created: IWhoWhenDto
+}
+
+
+export class HistoryFilterDto {
+	constructor(historyFilter: IHistoryFilter, Workspace: string) {
+		const { questionKey, filter, created} = historyFilter;
+		this.historyFilterDto = {
+			Workspace, 
+			Filter: filter,
+			QuestionKey: { Workspace, TopId: questionKey.topId, Id: questionKey.id },
+			Created: new WhoWhen2Dto(created).whoWhenDto!,
+		}
+	}
+	historyFilterDto: IHistoryFilterDto;
 }
 
 
@@ -181,7 +223,7 @@ export interface IGlobalContext {
 	getAnswer: (answerKey: IAnswerKey) => Promise<IAnswer | null>;
 	addHistory: (history: IHistory) => Promise<void>;
 	getAnswersRated: (questionKey: IQuestionKey) => Promise<any>;
-	addHistoryFilter: (historyFilterDto: IHistoryFilterDto) => Promise<void>;
+	addHistoryFilter: (historyFilter: IHistoryFilter) => Promise<void>;
 	setNodesReloaded: () => void;
 }
 
@@ -261,13 +303,6 @@ export type GlobalPayload = {
 
 	[GlobalActionTypes.DARK_MODE]: undefined;
 
-	[GlobalActionTypes.SET_ALL_CATEGORY_ROWS]: {
-		allCategoryRows: Map<string, ICategoryRow>
-	};
-
-	[GlobalActionTypes.SET_ALL_GROUP_ROWS]: {
-		allGroupRows: Map<string, IGroupRow>
-	};
 
 	[GlobalActionTypes.SET_NODES_RELOADED]: undefined;
 
@@ -282,55 +317,6 @@ export type GlobalPayload = {
 
 
 
-export interface IShortGroupsState {
-	loading: boolean,
-	parentId: string | null,
-	title: string,
-	shortGroups: IGroup[], // drop down groups
-	error?: Error;
-}
-
-// export interface IShortGroupInfo {
-// 	groupKey: IGroupKey | null,
-// 	level: number,
-// 	setParentGroup: (group: IShortGroup) => void;
-// }
-
-
-export enum ShortGroupsActionTypes {
-	SET_LOADING = 'SET_LOADING',
-	SET_SUB_SHORTGROUPS = 'SET_SUB_SHORTGROUPS',
-	SET_ERROR = 'SET_ERROR',
-	SET_EXPANDED = 'SET_EXPANDED',
-	SET_PARENT_SHORTGROUP = 'SET_PARENT_SHORTGROUP'
-}
-
-
-
-export type ShortGroupsPayload = {
-	[ShortGroupsActionTypes.SET_LOADING]: undefined;
-
-	[ShortGroupsActionTypes.SET_SUB_SHORTGROUPS]: {
-		groups: IGroup[];
-	};
-
-	[ShortGroupsActionTypes.SET_EXPANDED]: {
-		id: string;
-		expanding: boolean;
-	}
-
-	[ShortGroupsActionTypes.SET_ERROR]: {
-		error: Error;
-	};
-
-	[ShortGroupsActionTypes.SET_PARENT_SHORTGROUP]: {
-		group: IGroup;
-	};
-
-};
-
-export type ShortGroupsActions =
-	ActionMap<ShortGroupsPayload>[keyof ActionMap<ShortGroupsPayload>];
 
 
 ////////////////////////
@@ -384,12 +370,7 @@ export interface IRoleData {
 	users?: IUserData[]
 }
 
-
-export enum USER_ANSWER_ACTION {
-	NotFixed = 0,
-	Fixed = 1,
-	NotClicked = 2
-};
+export type USER_ANSWER_ACTION =	'NotFixed' | 'Fixed' | 'NotClicked';
 
 export interface IHistory {
 	id?: number;
@@ -400,17 +381,17 @@ export interface IHistory {
 }
 
 export interface IHistoryDto {
+	Workspace: string,
 	PartitionKey?: string;
 	Id?: number;
-	QuestionKey: IQuestionKey;
-	AssignedAnswerKey: IAssignedAnswerKey;
+	QuestionKey: IQuestionDtoKey;
+	AnswerKey: IAssignedAnswerDtoKey;
 	UserAction: USER_ANSWER_ACTION; // when client didn't click on 'Fixed' or 'Not fixed' buttons
 	Created: IWhoWhenDto
 }
 
-
 export interface IHistoryFilterDto {
-	QuestionKey: IQuestionKey;
+	QuestionKey: IQuestionDtoKey;
 	Filter: string;
 	Created: IWhoWhenDto
 }
@@ -448,7 +429,6 @@ export interface IUser {
 	level?: number;
 	isDarkMode?: boolean;
 }
-
 
 export type GlobalActions = ActionMap<GlobalPayload>[keyof ActionMap<GlobalPayload>];
 

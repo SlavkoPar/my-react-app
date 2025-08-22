@@ -1,29 +1,15 @@
-import { ActionMap, IWhoWhen, IRecord, IDto, Dto2WhoWhen, WhoWhen2Dto, IWhoWhenDto, IDtoKey } from 'global/types';
-import { IAnswer, IAnswerKey } from 'groups/types';
+import type { ActionMap, IRecord, IDto, IDtoKey, IWhoWhenDto, IWhoWhen } from '../global/types';
+import { Dto2WhoWhen, WhoWhen2Dto  } from '../global/types';
+import type { IAnswer, IAnswerKey } from './groups/types';
 
-export enum FormMode {
-	None = 'None',
-
-	AddingCategory = 'AddingCategory',
-	ViewingCategory = 'ViewingCategory',
-	EditingCategory = 'EditingCategory',
-	DeletingCategory = 'DeletingCategory',
-
-	AddingQuestion = 'AddingQuestion',
-	ViewingQuestion = 'ViewingQuestion',
-	EditingQuestion = 'EditingQuestion',
-	DeletingQuestion = 'DeletingQuestion',
-
-	AddingVariation = 'AddingVariation',
-	EditingVariation = 'EditingVariation',
-	ViewingVariation = 'ViewingVariation'
-}
+export type FormMode = 'None' | 'AddingCategory' | 'ViewingCategory' | 'EditingCategory' |
+	'DeletingCategory' | 'AddingQuestion' | 'ViewingQuestion' | 'EditingQuestion' | 'DeletingQuestion' | 
+	'AddingVariation' | 'EditingVariation' | 'ViewingVariation';
 
 export interface IFromUserAssignedAnswer {
 	id: string,
 	createdBy: string
 }
-
 
 export interface ICategoryRowDto extends IDtoKey {
 	Kind: number;
@@ -43,7 +29,6 @@ export interface ICategoryRowDto extends IDtoKey {
 export interface ICategoryDto extends ICategoryRowDto {
 	Doc1: string;
 }
-
 
 export interface ICategoryKey {
 	topId: string,
@@ -133,6 +118,14 @@ export class CategoryRow {
 
 /////////////////////////////////////
 // Question
+export interface IQuestionDtoKey {
+	Workspace?: string;
+	TopId: string,
+	ParentId: string;
+	Id: string;
+}
+
+
 
 export interface IQuestionKey {
 	topId: string,
@@ -611,6 +604,11 @@ export interface IQuestionFormProps {
 
 /////////////////////////////////////////////////
 // Assigned Answers
+export interface IAssignedAnswerDtoKey {
+	TopId: string;
+	Id: string;
+}
+
 
 export interface IAssignedAnswerKey {
 	topId: string;

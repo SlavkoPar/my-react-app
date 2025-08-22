@@ -10,11 +10,11 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faFolder } from '@fortawesome/free-solid-svg-icons'
 
 import { ICategoryRow, IQuestion, IQuestionEx, IQuestionKey, QuestionKey } from './categories/types';
-import { USER_ANSWER_ACTION } from './global/types';
+import { USER_ANSWER_ACTION, type IHistory } from './global/types';
 import { IChatBotAnswer, INewQuestion, INextAnswer, useAI } from './hooks/useAI'
 
-import Q from 'assets/Q.png';
-import A from 'assets/A.png';
+import Q from './assets/Q.png';
+import A from './assets/A.png';
 //import { useCategoryDispatch } from './categories/CategoryProvider';
 //import { isMobile } from 'react-device-detect';
 
@@ -40,7 +40,8 @@ interface IProps {
 
 const ChatBotDlg = ({ show, onHide }: IProps) => {
     //let { source, tekst, email } = useParams<ChatBotParams>();
-    //const dispatch = useCategoryDispatch();
+    let tekst = 'Pera';
+    const dispatch = useCategoryDispatch();
     const [autoSuggestionValue, setAutoSuggestionValue] = useState(tekst!)
     const [setNewQuestion, getCurrQuestion, getNextChatBotAnswer] = useAI([]);
     const [selectedQuestion, setSelectedQuestion] = useState<IQuestion | null>(null);
@@ -49,7 +50,7 @@ const ChatBotDlg = ({ show, onHide }: IProps) => {
     const [chatBotAnswer, setChatBotAnswer] = useState<IChatBotAnswer | null>(null);
     const [hasMoreAnswers, setHasMoreAnswers] = useState<boolean>(false);
 
-    const { getSubCats, getQuestion, addHistory, addHistoryFilter, getAnswersRated, searchQuestions, setLastRouteVisited } = useGlobalContext();
+    const { getSubCats, getQuestion, addHistory, addHistoryFilter, searchQuestions, setLastRouteVisited } = useGlobalContext();
     const { canEdit, authUser, isDarkMode, variant, bg, allCategoryRows, allCategoryRowsLoaded: catsLoaded } = useGlobalState();
     const navigate = useNavigate();
 
@@ -60,11 +61,8 @@ const ChatBotDlg = ({ show, onHide }: IProps) => {
 
     const [pastEvents, setPastEvents] = useState<IChild[]>([]);
 
-    enum ChildType {
-        AUTO_SUGGEST,
-        QUESTION,
-        ANSWER
-    }
+    type ChildType =  'AUTO_SUGGEST' | 'QUESTION' | 'ANSWER';
+    
 
     interface IChild {
         type: ChildType;
@@ -148,15 +146,15 @@ const ChatBotDlg = ({ show, onHide }: IProps) => {
 
     const onSelectQuestion = async (questionKey: IQuestionKey, underFilter: string) => {
         const questionCurr = await getCurrQuestion();
-        // if (questionCurr) {
-        //     console.log({ questionCurr })
-        //     const historyFilterDto: IHistoryFilterDto = {
-        //         QuestionKey: new QuestionKey(questionCurr).questionKey!,
-        //         Filter: underFilter,
-        //         Created: { Time: new Date, NickName: authUser.nickName }
-        //     }
-        //     await addHistoryFilter(historyFilterDto);
-        // }
+        if (questionCurr) {
+            console.log({ questionCurr })
+            const historyFilter: IHistoryFilter = {
+                questionKey: new QuestionKey(questionCurr).questionKey!,
+                filter: underFilter,
+                created: { time: new Date(), nickName: authUser.nickName }
+            }
+            await addHistoryFilter(historyFilter);
+        }
         // navigate(`/categories/${categoryId}_${questionId.toString()}`)
         // const question = await getQuestion(questionId);
 
@@ -177,7 +175,7 @@ const ChatBotDlg = ({ show, onHide }: IProps) => {
         */
         if (chatBotAnswer) {
             const props: IChild = {
-                type: ChildType.ANSWER,
+                type: 'ANSWER',
                 isDisabled: true,
                 txt: chatBotAnswer.answerTitle,
                 link: chatBotAnswer.answerLink
@@ -201,7 +199,7 @@ const ChatBotDlg = ({ show, onHide }: IProps) => {
 
         if (question) {
             const props: IChild = {
-                type: ChildType.QUESTION,
+                type: 'QUESTION',
                 isDisabled: true,
                 txt: question.title,
                 link: null
@@ -231,7 +229,7 @@ const ChatBotDlg = ({ show, onHide }: IProps) => {
 
     const onAnswerFixed = async () => {
         const props: IChild = {
-            type: ChildType.ANSWER,
+            type: 'ANSWER',
             isDisabled: true,
             txt: chatBotAnswer ? chatBotAnswer.answerTitle : 'no answer title',
             link: chatBotAnswer ? chatBotAnswer.answerLink : 'no answer link',
@@ -239,18 +237,16 @@ const ChatBotDlg = ({ show, onHide }: IProps) => {
         }
         setPastEvents((prevHistory) => [...prevHistory, props]);
 
-        /*
         const history: IHistory = {
             questionKey: new QuestionKey(selectedQuestion!).questionKey!,
             assignedAnswerKey: { topId: chatBotAnswer!.topId, id: chatBotAnswer!.id },
-            userAction: USER_ANSWER_ACTION.Fixed,
+            userAction: 'Fixed',
             created: {
                 nickName: authUser.nickName,
                 time: new Date()
             }
         }
         addHistory(history);
-        */
 
         //
         // TODO logic 
@@ -265,7 +261,7 @@ const ChatBotDlg = ({ show, onHide }: IProps) => {
     const getNextAnswer = async () => {
         // past events
         const props: IChild = {
-            type: ChildType.ANSWER,
+            type: 'ANSWER',
             isDisabled: true,
             txt: chatBotAnswer ? chatBotAnswer.answerTitle : 'no answer',
             link: chatBotAnswer ? chatBotAnswer.answerLink : 'no link',
@@ -276,18 +272,18 @@ const ChatBotDlg = ({ show, onHide }: IProps) => {
         const next: INextAnswer = await getNextChatBotAnswer();
         const { nextChatBotAnswer, hasMoreAnswers } = next;
 
-        /*if (chatBotAnswer) {
+        if (chatBotAnswer) {
             const history: IHistory = {
                 questionKey: new QuestionKey(selectedQuestion!).questionKey!,
                 assignedAnswerKey: { topId: chatBotAnswer.topId, id: chatBotAnswer.id },
-                userAction: nextChatBotAnswer ? USER_ANSWER_ACTION.NotFixed : USER_ANSWER_ACTION.NotClicked,
+                userAction: nextChatBotAnswer ? 'NotFixed' : 'NotClicked',
                 created: {
                     nickName: authUser.nickName,
                     time: new Date()
                 }
             }
             addHistory(history);
-        }*/
+        }
 
         // salji gore
         // if (nextAnswer) {
@@ -534,7 +530,7 @@ const ChatBotDlg = ({ show, onHide }: IProps) => {
     // };
     console.log("=====================>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>> rendering ChatBotDlg")
     return (
-        <div className="offcanvas offcanvas-end offcanvas-scroll show" tabIndex={-1} id="offcanvasExample" aria-labelledby="offcanvasExampleLabel">
+<div className="offcanvas offcanvas-end offcanvas-scroll show" tabIndex={-1} id="offcanvasExample" aria-labelledby="offcanvasExampleLabel">
             <div className="offcanvas-header">
                 <h5 className="offcanvas-title" id="offcanvasExampleLabel">Offcanvas</h5>
                 <button type="button" className="btn-close text-reset" data-bs-dismiss="offcanvas" aria-label="Close"></button>
@@ -559,3 +555,27 @@ const ChatBotDlg = ({ show, onHide }: IProps) => {
 };
 
 export default ChatBotDlg;
+
+/*
+  <div className="offcanvas offcanvas-end offcanvas-scroll show" tabIndex={-1} id="offcanvasExample" aria-labelledby="offcanvasExampleLabel">
+            <div className="offcanvas-header">
+                <h5 className="offcanvas-title" id="offcanvasExampleLabel">Offcanvas</h5>
+                <button type="button" className="btn-close text-reset" data-bs-dismiss="offcanvas" aria-label="Close"></button>
+            </div>
+            <div className="offcanvas-body">
+                <div>
+                    Some text as placeholder. In real life you can have the elements you have chosen. Like, text, images, lists, etc.
+                </div>
+                <div className="dropdown mt-3">
+                    <button className="btn btn-secondary dropdown-toggle" type="button" id="dropdownMenuButton" data-bs-toggle="dropdown">
+                        Dropdown buttonnn
+                    </button>
+                    <ul className="dropdown-menu" aria-labelledby="dropdownMenuButton">
+                        <li><a className="dropdown-item" href="#">Action</a></li>
+                        <li><a className="dropdown-item" href="#">Another action</a></li>
+                        <li><a className="dropdown-item" href="#">Something else here</a></li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+*/

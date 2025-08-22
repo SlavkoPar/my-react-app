@@ -9,33 +9,31 @@ import Button from 'react-bootstrap/Button'
 // import { protectedResources } from "authConfig";
 import Offcanvas from 'react-bootstrap/Offcanvas'
 import ChatBotDlg from './ChatBotDlg'
+import { Question, QuestionKey, type IQuestionDtoEx, type IQuestionEx, type IQuestionKey, type IQuestionRow, type IQuestionRowDto, type IQuestionRowDtosEx } from './categories/types'
+import { protectedResources } from './global/authConfig'
 
 function App() {
-  const [count, setCount] = useState(0)
 
-  const [show, setShow] = useState(false);
+   const [show, setShow] = useState(false);
 
   const handleClose = () => setShow(false);
   const handleShow = () => setShow(true);
 
+ 
   return (
     <>
-      <div>
+      {/* <div>
         <a href="https://vite.dev" target="_blank">
           <img src={viteLogo} className="logo" alt="Vite logo" />
         </a>
         <a href="https://react.dev" target="_blank">
           <img src={reactLogo} className="logo react" alt="React logo" />
         </a>
-      </div>
-      <h1>Vite + React</h1>
+      </div> */}
       <div className="card">
-        <button onClick={() => setCount((count) => count + 1)}>
+        {/* <button onClick={() => setCount((count) => count + 1)}>
           count is {count}
-        </button>
-        <p>
-          Edit <code>src/App.tsx</code> and save to test HMR
-        </p>
+        </button> */}
       </div>
 
       <Button variant="primary" onClick={handleShow}>

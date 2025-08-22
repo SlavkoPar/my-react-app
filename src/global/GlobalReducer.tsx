@@ -1,8 +1,8 @@
 
 import { Reducer } from 'react'
 import { IGlobalState, GlobalActionTypes, GlobalActions, ROLES, IAuthUser, ILocStorage } from "./types";
-import { ICategoryRow } from 'categories/types';
-import { IGroupRow } from 'groups/types';
+import { ICategoryRow } from '../categories/types';
+import { IGroupRow } from '../groups/types';
 
 export const initialAuthUser: IAuthUser = {
     nickName: '',

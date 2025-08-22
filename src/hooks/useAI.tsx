@@ -1,19 +1,8 @@
 import React, { useCallback, useEffect, useState } from "react";
 
-import { IAssignedAnswer, ICategory, IQuestion, IQuestionKey } from 'categories/types';
-import { useGlobalContext } from "global/GlobalProvider";
-import { IAnswer, IAnswerKey } from "groups/types";
-import { IWhoWhen } from "global/types";
+import type { IAssignedAnswer, ICategory, IQuestion, IQuestionKey } from '../categories/types';
 
-export interface IChatBotAnswer {
-  questionKey?: IQuestionKey;
-  topId: string;
-  id: string;
-  answerTitle: string;
-  answerLink: string | null;
-  created: IWhoWhen,
-  modified: IWhoWhen | null
-}
+import type { IChatBotAnswer } from '../global/types';
 
 class ChatBotAnswer {
   constructor(assignedAnswer: IAssignedAnswer) {

@@ -6,7 +6,7 @@ import AutosuggestHighlightParse from "autosuggest-highlight/parse";
 
 import { debounce, escapeRegexCharacters } from '../utilities'
 import './AutoSuggestQuestions.css'
-import { ICategoryRow, IQuestionKey, IQuestionRow, QuestionKey } from 'categories/types';
+import { ICategoryRow, IQuestionKey, IQuestionRow, QuestionKey } from './types';
 
 
 interface ICatMy {
