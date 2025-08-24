@@ -58,16 +58,10 @@ export const msalConfig = {
  */
 export const protectedResources = {
     KnowledgeAPI: {
-        endpointCategoryRow: `${process.env.REACT_APP_API_URL}/CategoryRow`,
-        endpointCategory: `${process.env.REACT_APP_API_URL}/Category`,
-        endpointQuestion: `${process.env.REACT_APP_API_URL}/Question`,
-        endpointQuestionAnswer: `${process.env.REACT_APP_API_URL}/QuestionAnswer`,
-        //endpointShortGroup: `${process.env.REACT_APP_API_URL}/ShortGroup`,
-        endpointGroupRow: `${process.env.REACT_APP_API_URL}/GroupRow`,
-        endpointGroup: `${process.env.REACT_APP_API_URL}/Group`,
-        endpointAnswer: `${process.env.REACT_APP_API_URL}/Answer`,
-        endpointHistory: `${process.env.REACT_APP_API_URL}/History`,
-        endpointHistoryFilter: `${process.env.REACT_APP_API_URL}/HistoryFilter`,
+        endpointCategoryRow: `${import.meta.env.REACT_APP_API_URL}/CategoryRow`,
+        endpointQuestion: `${import.meta.env.REACT_APP_API_URL}/Question`,
+        endpointHistory: `${import.meta.env.REACT_APP_API_URL}/History`,
+        endpointHistoryFilter: `${import.meta.env.REACT_APP_API_URL}/HistoryFilter`,
         scopes: {
             read: ['api://91385bcd-f531-4b1c-8b3d-2105439f0a8a/ToDoList.Read'],
             write: ['api://91385bcd-f531-4b1c-8b3d-2105439f0a8a/ToDoList.ReadWrite']

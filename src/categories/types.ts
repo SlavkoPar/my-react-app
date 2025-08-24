@@ -1,9 +1,9 @@
 import type { ActionMap, IRecord, IDto, IDtoKey, IWhoWhenDto, IWhoWhen } from '../global/types';
-import { Dto2WhoWhen, WhoWhen2Dto  } from '../global/types';
+import { Dto2WhoWhen, WhoWhen2Dto } from '../global/types';
 import type { IAnswer, IAnswerKey } from './groups/types';
 
 export type FormMode = 'None' | 'AddingCategory' | 'ViewingCategory' | 'EditingCategory' |
-	'DeletingCategory' | 'AddingQuestion' | 'ViewingQuestion' | 'EditingQuestion' | 'DeletingQuestion' | 
+	'DeletingCategory' | 'AddingQuestion' | 'ViewingQuestion' | 'EditingQuestion' | 'DeletingQuestion' |
 	'AddingVariation' | 'EditingVariation' | 'ViewingVariation';
 
 export interface IFromUserAssignedAnswer {
@@ -42,6 +42,17 @@ export interface IKeyExpanded {
 	questionId: string | null;
 }
 
+
+// export interface ICat {
+// 	TopId: string,
+// 	Id: string;
+// 	ParentId: string | null;
+// 	Title: string;
+// 	Level: number;
+// 	TitlesUpTheTree?: string;
+// }
+
+/*
 export interface ICategoryRow extends ICategoryKey, IRecord {
 	kind: number;
 	title: string;
@@ -57,6 +68,8 @@ export interface ICategoryRow extends ICategoryKey, IRecord {
 	isExpanded?: boolean;
 	titlesUpTheTree?: string;
 }
+
+
 export interface ICategory extends ICategoryRow {
 	doc1: string, // some document optionally, used in Category, but not not in CategoryRow
 }
@@ -114,6 +127,7 @@ export class CategoryRow {
 	}
 	categoryRow: ICategoryRow;
 }
+	*/
 
 
 /////////////////////////////////////
@@ -133,23 +147,56 @@ export interface IQuestionKey {
 	id: string;
 }
 
-export interface IQuestionRow extends IQuestionKey, IRecord {
-	title: string;
-	numOfAssignedAnswers: number;
-	categoryTitle?: string;
-	// isSelected?: boolean;
-	included: boolean;
+// export interface IQuestionRow extends IQuestionKey, IRecord {
+// 	title: string;
+// 	numOfAssignedAnswers: number;
+// 	categoryTitle?: string;
+// 	// isSelected?: boolean;
+// 	included: boolean;
+// }
+
+// export interface IQuestion extends IQuestionRow {
+// 	assignedAnswers: IAssignedAnswer[];
+// 	relatedFilters: IRelatedFilter[]
+// 	numOfRelatedFilters: number,
+// 	source: number;
+// 	status: number;
+// 	fromUserAssignedAnswer?: IFromUserAssignedAnswer[];
+// 	categoryTitle?: string;
+// }
+
+export interface ICatDto {
+	TopId: string;
+	Id: string;
+	ParentId?: string; // it is null for Top Categories
+	Title: string;
+	Level: number;
 }
 
-export interface IQuestion extends IQuestionRow {
-	assignedAnswers: IAssignedAnswer[];
-	relatedFilters: IRelatedFilter[]
-	numOfRelatedFilters: number,
-	source: number;
-	status: number;
-	fromUserAssignedAnswer?: IFromUserAssignedAnswer[];
+export interface ICat {
+	topId: string;
+	id: string;
+	parentId: string | null; // it is null for Top Categories
+	level: number;
+	title: string;
 	categoryTitle?: string;
+	titlesUpTheTree?: string
 }
+
+export class Cat {
+	constructor(catDto: ICatDto) {
+		const { TopId, ParentId, Id, Level, Title } = catDto;
+		this.cat = {
+			topId: TopId,
+			id: Id,
+			parentId: ParentId ?? null, // it is null for Top Categories
+			level: Level,
+			title: Title
+		}
+	}
+	cat: ICat
+}
+
 
 export interface IRelatedFilter {
 	questionKey: IQuestionKey | null;

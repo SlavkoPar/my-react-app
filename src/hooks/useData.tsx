@@ -1,17 +1,61 @@
 import { useCallback, useState } from "react";
-import { Question, QuestionKey, type IQuestionDtoEx, type IQuestionEx, type IQuestionKey, type IQuestionRow, type IQuestionRowDto, type IQuestionRowDtosEx } from "../categories/types";
+import { Cat, Question, QuestionKey, type IAssignedAnswer, type ICat, type ICatDto, type IQuestion, type IQuestionDtoEx, type IQuestionEx, type IQuestionKey, type IQuestionRow, type IQuestionRowDto, type IQuestionRowDtosEx } from "../categories/types";
 import { HistoryDto, HistoryFilterDto, type IHistory, type IHistoryDto, type IHistoryDtoEx, type IHistoryFilter } from "../global/types";
-import { protectedResources } from "../global/authConfig";
+import { protectedResources } from "../authConfig";
 
 
-export const useData = (): [
-  (questionKey: IQuestionKey) => Promise<IQuestionEx>,
-  (filter: string, count: number) => Promise<IQuestionRow[]>,
-  (history: IHistory) => Promise<void>,
-  (historyFilter: IHistoryFilter) => Promise<void>,
+import type { IAuthUser, IChatBotAnswer, IGlobalState, INewQuestion, INextAnswer, USER_ANSWER_ACTION } from '../global/types';
+
+class ChatBotAnswer {
+  constructor(assignedAnswer: IAssignedAnswer) {
+    const { topId, id, answerTitle, answerLink, created, modified } = assignedAnswer;
+    this.chatBotAnswer = {
+      topId,
+      id,
+      answerTitle: answerTitle ?? '',
+      answerLink: answerLink ?? '',
+      created: assignedAnswer.created!,
+      modified: assignedAnswer.modified!
+    }
+  }
+  chatBotAnswer: IChatBotAnswer
+}
+
+const initialGlobalState: IGlobalState = {
+  isAuthenticated: null,
+  ws: '',
+  everLoggedIn: false,
+  canAdd: false,
+  isOwner: false,
+  isDarkMode: true,
+  variant: '',
+  bg: ''
+}
+
+
+export const useData = (ws: string): [
+  Map<string, ICat> | null, // allCats
+  () => Promise<Map<string, ICat>>, // loadCats
+  (questionKey: IQuestionKey) => Promise<IQuestionEx>, // getQuestion
+  IQuestion | null, // selectedQuestion
+  IChatBotAnswer | null, // firstAnswer
+  boolean, // hasMoreAnswers
+  () => Promise<INextAnswer>, // getNextAnswer
+  (filter: string, count: number) => Promise<IQuestionRow[]>, // searchQuestions
+  (userAction: string) => Promise<void>, // addHistory
+  (underFilter: string) => Promise<void> // addHistoryFilter
 ] => {
 
-  const [workspace, setWorkspace] = useState("DEMO");
+  const [globalState, setGlobalState] = useState<IGlobalState>(initialGlobalState);
+  const [authUser, setAuthUser] = useState<IAuthUser>({ nickName: '', name: '' });
+  const [workspace] = useState(ws);
+  const [allCats, setAllCats] = useState<Map<string, ICat> | null>(null);
+  const [newQuestion, setNewQuestion] = useState<INewQuestion | null>(null);
+  const [selectedQuestion, setSelectedQuestion] = useState<IQuestion | null>(null);
+  const [firstAnswer, setFirstAnswer] = useState<IChatBotAnswer | null>(null);
+  const [hasMoreAnswers, setHasMoreAnswers] = useState(false);
+  const [nextAnswer, setNextAnswer] = useState<IChatBotAnswer | null>(null);
+  const [index, setIndex] = useState(-1);
 
   const Execute = async (method: string, endpoint: string, data: object | null = null): Promise<object> => {
     const accessToken = localStorage.getItem("accessToken");
@@ -65,33 +109,81 @@ export const useData = (): [
     return JSON.parse("")
   }
 
+  const loadCats = useCallback(async (): Promise<Map<string, ICat>> => {
+    return new Promise((resolve) => {
+      const cats = new Map<string, ICat>();
+      try {
+        console.time();
+        const url = `${protectedResources.KnowledgeAPI.endpointCategoryRow}/${workspace}/allCats`;
+        Execute("GET", url, null)
+          .then((value: object) => {
+            console.timeEnd();
+            const catDtos: ICatDto[] = value as ICatDto[];
+            catDtos.forEach((catDto: ICatDto) => cats.set(catDto.Id, new Cat(catDto).cat));
+            cats.forEach((cat: ICat) => {
+              const { id, parentId } = cat;
+              let titlesUpTheTree = id;
+              let parentCat = parentId;
+              while (parentCat) {
+                const cat2 = cats.get(parentCat)!;
+                titlesUpTheTree = cat2!.id + ' / ' + titlesUpTheTree;
+                parentCat = cat2.parentId;
+              }
+              cat.titlesUpTheTree = titlesUpTheTree;
+              cats.set(id, cat);
+            })
+            setAllCats(cats);
+          });
+      }
+      catch (error: unknown) {
+        console.log(error)
+      }
+      resolve(cats);
+    });
+  }, [workspace]);
+
+
   const getQuestion = async (questionKey: IQuestionKey): Promise<IQuestionEx> => {
     return new Promise((resolve) => {
       try {
         const { topId, id } = questionKey;
         const query = new QuestionKey(questionKey).toQuery(workspace);
         const url = `${protectedResources.KnowledgeAPI.endpointQuestion}?${query}`;
-        console.time()
+        console.time();
         Execute("GET", url)
           .then((value: object): void => {
             const x: IQuestionDtoEx = value as IQuestionDtoEx;
             console.timeEnd();
             const { questionDto, msg } = x;
             if (questionDto) {
-              const questionEx: IQuestionEx = {
-                question: new Question(questionDto).question,
-                msg
+              const question = new Question(questionDto).question;
+              let newQuestion = null;
+              if (question) {
+                const { assignedAnswers } = question;
+                if (assignedAnswers && assignedAnswers.length > 0) {
+                  const assignedAnswer = assignedAnswers[0];
+                  const firstAnswer = new ChatBotAnswer(assignedAnswer).chatBotAnswer;
+                  const hasMoreAnswers = assignedAnswers.length > 1;
+                  setFirstAnswer(firstAnswer);
+                  setHasMoreAnswers(hasMoreAnswers);
+                  setIndex(0);
+                  newQuestion = {
+                    question,
+                    firstAnswer,
+                    hasMoreAnswers
+                  }
+                }
               }
-              resolve(questionEx);
+              setNewQuestion(newQuestion);
+              setSelectedQuestion(question);
+              resolve({ question, msg: '' } as IQuestionEx)
             }
             else {
-              const questionEx: IQuestionEx = {
-                question: null,
-                msg
-              }
-              resolve(questionEx);
+              setNewQuestion(null);
+              setSelectedQuestion(null);
+              setIndex(-1);
+              resolve({ question: null, msg } as IQuestionEx)
             }
-            //}
           });
       }
       catch (error: unknown) {
@@ -104,7 +196,6 @@ export const useData = (): [
       }
     })
   }
-
 
   //const searchQuestions = useCallback(async (execute: (method: string, endpoint: string) => Promise<any>, filter: string, count: number): Promise<any> => {
   const searchQuestions = async (filter: string, count: number): Promise<IQuestionRow[]> => {
@@ -157,8 +248,36 @@ export const useData = (): [
   }
   //}, []);
 
+
+  const getNextAnswer = useCallback(
+    async (): Promise<INextAnswer> => {
+      const { assignedAnswers } = newQuestion!.question!;
+      const len = assignedAnswers.length;
+      const i = index + 1;
+      if (index + 1 < len) {
+        setIndex(i);
+        return {
+          nextChatBotAnswer: new ChatBotAnswer(assignedAnswers[i]).chatBotAnswer,
+          hasMoreAnswers: i + 1 < len
+        }
+      }
+      return { nextChatBotAnswer: null, hasMoreAnswers: false }
+    }, [newQuestion, index]);
+
+
   const addHistory = useCallback(
-    async (history: IHistory): Promise<void> => {
+    async (userAction: string): Promise<void> => {
+      const { assignedAnswers } = selectedQuestion!;
+      const assignedAnswer = assignedAnswers[index];
+      const history: IHistory = {
+        questionKey: new QuestionKey(selectedQuestion!).questionKey!,
+        assignedAnswerKey: { topId: assignedAnswer.topId, id: assignedAnswer.id },
+        userAction: userAction as USER_ANSWER_ACTION,
+        created: {
+          nickName: authUser.nickName,
+          time: new Date()
+        }
+      }
       //const { topId, id, variations, title, kind, modified } = history;
       //dispatch({ type: ActionTypes.SET_CATEGORY_LOADING, payload: { id, loading: false } });
       try {
@@ -185,13 +304,22 @@ export const useData = (): [
         console.log(error)
         //dispatch({ type: ActionTypes.SET_ERROR, payload: { error: new Error('Server Error') } });
       }
-    }, [workspace]);
+    }, [workspace, authUser, selectedQuestion, index]);
 
 
-  const addHistoryFilter = useCallback(async (historyFilter: IHistoryFilter): Promise<void> => {
+  const addHistoryFilter = useCallback(async (underFilter: string): Promise<void> => {
     //const { topId, id, variations, title, kind, modified } = history;
     //dispatch({ type: ActionTypes.SET_CATEGORY_LOADING, payload: { id, loading: false } });
     try {
+      if (newQuestion === null)
+        return;
+
+      const { question } = newQuestion;
+      const historyFilter: IHistoryFilter = {
+        questionKey: new QuestionKey(question!).questionKey!,
+        filter: underFilter,
+        created: { time: new Date(), nickName: authUser.nickName }
+      }
       const historyFilterDto = new HistoryFilterDto(historyFilter, workspace).historyFilterDto;
       //console.log("historyDto", { historyDto })
       const url = `${protectedResources.KnowledgeAPI.endpointHistoryFilter}`;
@@ -216,7 +344,12 @@ export const useData = (): [
     }
   }, [workspace]);
 
-  return [getQuestion, searchQuestions, addHistory, addHistoryFilter]
+  return [
+    allCats, loadCats,
+    getQuestion, selectedQuestion, firstAnswer, hasMoreAnswers, getNextAnswer,
+    searchQuestions,
+    addHistory, addHistoryFilter
+  ]
   // useCallback(setNewQuestion, []), 
   // useCallback(getCurrQuestion, [question]), 
   // useCallback(getNextChatBotAnswer, [question])

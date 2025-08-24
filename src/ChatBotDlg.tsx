@@ -1,20 +1,21 @@
 import React, { useEffect, useState, useRef } from 'react';
 //import { Container, Row, Col, Button, Form, ListGroup, Offcanvas, Stack } from "react-bootstrap";
-import { Container, Row, Col, Button, Form } from "react-bootstrap";
+import { Container, Row, Col, Button, Form, Offcanvas } from "react-bootstrap";
 
-import { useGlobalContext, useGlobalState } from './global/GlobalProvider';
 
 import { AutoSuggestQuestions } from './categories/AutoSuggestQuestions';
 
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faFolder } from '@fortawesome/free-solid-svg-icons'
 
-import { ICategoryRow, IQuestion, IQuestionEx, IQuestionKey, QuestionKey } from './categories/types';
-import { USER_ANSWER_ACTION, type IHistory } from './global/types';
-import { IChatBotAnswer, INewQuestion, INextAnswer, useAI } from './hooks/useAI'
+
+import { Question, QuestionKey, type ICategoryRow, type IQuestion, type IQuestionDtoEx, type IQuestionEx, type IQuestionKey, type IQuestionRow, type IQuestionRowDto, type IQuestionRowDtosEx } from './categories/types'
+
+import { type IChatBotAnswer, type IHistory, type IHistoryFilter, type INewQuestion, type INextAnswer } from './global/types';
 
 import Q from './assets/Q.png';
 import A from './assets/A.png';
+import { useData } from './hooks/useData';
 //import { useCategoryDispatch } from './categories/CategoryProvider';
 //import { isMobile } from 'react-device-detect';
 
@@ -41,28 +42,34 @@ interface IProps {
 const ChatBotDlg = ({ show, onHide }: IProps) => {
     //let { source, tekst, email } = useParams<ChatBotParams>();
     let tekst = 'Pera';
-    const dispatch = useCategoryDispatch();
     const [autoSuggestionValue, setAutoSuggestionValue] = useState(tekst!)
-    const [setNewQuestion, getCurrQuestion, getNextChatBotAnswer] = useAI([]);
-    const [selectedQuestion, setSelectedQuestion] = useState<IQuestion | null>(null);
+    //    const [setNewQuestion, getCurrQuestion, getNextChatBotAnswer] = useAI([]);
+
+    const [
+        allCats, loadCats,
+        getQuestion, selectedQuestion, firstAnswer, hasMoreAnswers, getNextAnswer,
+        searchQuestions,
+        addHistory, addHistoryFilter
+    ] = useData("DEMO");
+
+    useEffect(() => {
+        (async () => {
+            await loadCats()
+        })()
+    }, [loadCats])
+
+    //const [selectedQuestion, setSelectedQuestion] = useState<IQuestion | null>(null);
     const [autoSuggestId, setAutoSuggestId] = useState<number>(1);
     const [showAnswer, setShowAnswer] = useState(false);
     const [chatBotAnswer, setChatBotAnswer] = useState<IChatBotAnswer | null>(null);
-    const [hasMoreAnswers, setHasMoreAnswers] = useState<boolean>(false);
 
-    const { getSubCats, getQuestion, addHistory, addHistoryFilter, searchQuestions, setLastRouteVisited } = useGlobalContext();
-    const { canEdit, authUser, isDarkMode, variant, bg, allCategoryRows, allCategoryRowsLoaded: catsLoaded } = useGlobalState();
-    const navigate = useNavigate();
 
     const [catsSelected, setCatsSelected] = useState(true);
     const [showAutoSuggest, setShowAutoSuggest] = useState(true); //false);
 
-    const [catLevels, setCatLevels] = useState<ICatLevel[]>([]);
-
     const [pastEvents, setPastEvents] = useState<IChild[]>([]);
 
-    type ChildType =  'AUTO_SUGGEST' | 'QUESTION' | 'ANSWER';
-    
+    type ChildType = 'AUTO_SUGGEST' | 'QUESTION' | 'ANSWER';
 
     interface IChild {
         type: ChildType;
@@ -78,7 +85,8 @@ const ChatBotDlg = ({ show, onHide }: IProps) => {
     // 	})()
     // }, [])
 
-    const onEntering = async (node: HTMLElement, isAppearing: boolean): Promise<any> => {
+    /*
+    const onEntering = async (node: HTMLElement, isAppearing: boolean): Promise<unknown> => {
         setCatLevels([]);
         const parentId = 'MTS'; // null
         const res = await getSubCats(parentId);
@@ -96,6 +104,7 @@ const ChatBotDlg = ({ show, onHide }: IProps) => {
         ]))
 
     }
+    */
 
     const scrollableRef = useRef<HTMLDivElement>(null);
 
@@ -103,48 +112,12 @@ const ChatBotDlg = ({ show, onHide }: IProps) => {
     //     scrollToBottom();
     // }, []);
 
-    if (!catsLoaded) // || catsOptions.length === 0)
-        return <div>cats not loaded...</div>
+    // if (!catsLoaded) // || catsOptions.length === 0)
+    //     return <div>cats not loaded...</div>
 
-    const onOptionChange = async (id: string, level: number, title: string) => {//event: React.ChangeEvent<HTMLInputElement>) => {
-        //const target = event.target;
-        //const { id, name } = target;
-        //const value = type === 'checkbox' ? target.checked : target.value;
-        //const level = parseInt(name as any);
-        // update the last level
-        const prev = catLevels.map(catLevel => catLevel.level === level
-            ? {
-                ...catLevel,
-                subCatIdSelected: id,
-                header: title
-            }
-            : catLevel
-        )
-
-        const res = await getSubCats(id);
-        const { subCats, parentHeader } = res;
-
-        console.log('///////////////////////////////////////////////////// id:', id, subCats)
-        setCatLevels((prevState) => ([
-            ...prev,
-            {
-                level: level + 1,
-                catId: id,
-                header: parentHeader,
-                subCats,
-                subCatIdSelected: null
-            }
-        ]))
-        //setShowUsage(true);
-        // setCatOptions((prevState) => ({ 
-        // 	stateName: prevState.stateName + 1 
-        // }))
-        // this.setState({
-        // 	 [name]: value
-        // });
-    }
 
     const onSelectQuestion = async (questionKey: IQuestionKey, underFilter: string) => {
+        /*
         const questionCurr = await getCurrQuestion();
         if (questionCurr) {
             console.log({ questionCurr })
@@ -155,6 +128,8 @@ const ChatBotDlg = ({ show, onHide }: IProps) => {
             }
             await addHistoryFilter(historyFilter);
         }
+        */
+        await addHistoryFilter(underFilter); // nothing happens when question is NULL
         // navigate(`/categories/${categoryId}_${questionId.toString()}`)
         // const question = await getQuestion(questionId);
 
@@ -194,8 +169,8 @@ const ChatBotDlg = ({ show, onHide }: IProps) => {
             setAutoSuggestionValue(question.relatedFilters[0].filter)
         }
 
-        const res: INewQuestion = await setNewQuestion(question);
-        let { firstChatBotAnswer, hasMoreAnswers } = res; // as unknown as INewQuestion;
+        //const res: INewQuestion = await setNewQuestion(question);
+        //let { firstChatBotAnswer, hasMoreAnswers } = res; // as unknown as INewQuestion;
 
         if (question) {
             const props: IChild = {
@@ -213,7 +188,7 @@ const ChatBotDlg = ({ show, onHide }: IProps) => {
         setShowAnswer(true);
         setHasMoreAnswers(hasMoreAnswers);
         //setAnswerId((answerId) => answerId + 1);
-        setChatBotAnswer(firstChatBotAnswer);
+        setChatBotAnswer(firstAnswer);
         // // salji kasnije kad klikne na Fixed
         // if (firstAnswer) {
         // 	addHistory(dbp, {
@@ -246,19 +221,20 @@ const ChatBotDlg = ({ show, onHide }: IProps) => {
                 time: new Date()
             }
         }
-        addHistory(history);
+        const userAction = 'Fixed';
+        addHistory(userAction);
 
         //
         // TODO logic 
         //
 
-        setHasMoreAnswers(false);
+        //setHasMoreAnswers(false);
         //setAnswerId((answerId) => answerId + 1);
         setChatBotAnswer(chatBotAnswer); //undefined);
         setShowAnswer(false);
     }
 
-    const getNextAnswer = async () => {
+    const getNextChatBotAnswer = async () => {
         // past events
         const props: IChild = {
             type: 'ANSWER',
@@ -269,20 +245,21 @@ const ChatBotDlg = ({ show, onHide }: IProps) => {
         }
         setPastEvents((prevHistory) => [...prevHistory, props]);
 
-        const next: INextAnswer = await getNextChatBotAnswer();
+        const next: INextAnswer = await getNextAnswer();
         const { nextChatBotAnswer, hasMoreAnswers } = next;
 
         if (chatBotAnswer) {
-            const history: IHistory = {
-                questionKey: new QuestionKey(selectedQuestion!).questionKey!,
-                assignedAnswerKey: { topId: chatBotAnswer.topId, id: chatBotAnswer.id },
-                userAction: nextChatBotAnswer ? 'NotFixed' : 'NotClicked',
-                created: {
-                    nickName: authUser.nickName,
-                    time: new Date()
-                }
-            }
-            addHistory(history);
+            // const history: IHistory = {
+            //     questionKey: new QuestionKey(selectedQuestion!).questionKey!,
+            //     assignedAnswerKey: { topId: chatBotAnswer.topId, id: chatBotAnswer.id },
+            //     userAction: nextChatBotAnswer ? 'NotFixed' : 'NotClicked',
+            //     created: {
+            //         nickName: authUser.nickName,
+            //         time: new Date()
+            //     }
+            // }
+            const userAction = nextChatBotAnswer ? 'NotFixed' : 'NotClicked';
+            addHistory(userAction);
         }
 
         // salji gore
@@ -296,7 +273,7 @@ const ChatBotDlg = ({ show, onHide }: IProps) => {
         // 		created: new Date()
         // 	})
         // }
-        setHasMoreAnswers(hasMoreAnswers);
+        //setHasMoreAnswers(hasMoreAnswers);
         //setAnswerId((answerId) => answerId + 1); PPP
         console.log('----->>>>', { nextChatBotAnswer })
         setChatBotAnswer(nextChatBotAnswer);
@@ -441,7 +418,7 @@ const ChatBotDlg = ({ show, onHide }: IProps) => {
                             <Button
                                 size="sm"
                                 type="button"
-                                onClick={getNextAnswer}
+                                onClick={getNextChatBotAnswer}
                                 disabled={!chatBotAnswer}
                                 className='align-middle ms-1 border border-1 rounded-1 px-1 py-0'
                                 variant="danger"
@@ -480,7 +457,7 @@ const ChatBotDlg = ({ show, onHide }: IProps) => {
                                                 <Button
                                                     size="sm"
                                                     type="button"
-                                                    onClick={getNextAnswer}
+                                                    onClick={getNextChatBotAnswer}
                                                     disabled={!chatBotAnswer}
                                                     className='align-middle ms-1 border border-1 rounded-1 p-0'
                                                     variant="danger"
@@ -516,7 +493,7 @@ const ChatBotDlg = ({ show, onHide }: IProps) => {
                         <AutoSuggestQuestions
                             tekst={txt}
                             onSelectQuestion={onSelectQuestion}
-                            allCategoryRows={allCategoryRows}
+                            allCats={allCats!}
                             searchQuestions={searchQuestions}
                         />
                     }
@@ -529,27 +506,107 @@ const ChatBotDlg = ({ show, onHide }: IProps) => {
     //     scrollableRef.current?.scrollIntoView({ behavior: 'smooth', block: 'end' });
     // };
     console.log("=====================>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>> rendering ChatBotDlg")
+    if (!allCats)
+        return 'loading ...'
+
     return (
-<div className="offcanvas offcanvas-end offcanvas-scroll show" tabIndex={-1} id="offcanvasExample" aria-labelledby="offcanvasExampleLabel">
-            <div className="offcanvas-header">
-                <h5 className="offcanvas-title" id="offcanvasExampleLabel">Offcanvas</h5>
-                <button type="button" className="btn-close text-reset" data-bs-dismiss="offcanvas" aria-label="Close"></button>
-            </div>
-            <div className="offcanvas-body">
-                <div>
-                    Some text as placeholder. In real life you can have the elements you have chosen. Like, text, images, lists, etc.
-                </div>
-                <div className="dropdown mt-3">
-                    <button className="btn btn-secondary dropdown-toggle" type="button" id="dropdownMenuButton" data-bs-toggle="dropdown">
-                        Dropdown buttonnn
-                    </button>
-                    <ul className="dropdown-menu" aria-labelledby="dropdownMenuButton">
-                        <li><a className="dropdown-item" href="#">Action</a></li>
-                        <li><a className="dropdown-item" href="#">Another action</a></li>
-                        <li><a className="dropdown-item" href="#">Something else here</a></li>
-                    </ul>
-                </div>
-            </div>
+        <div className="pe-6 overflow-auto chat-bot-dlg">
+            {/* backdrop="static" */}
+            <Offcanvas show={show} onHide={onHide} placement='end' scroll={true} backdrop={true} onEntering={onEntering}> {/* backdropClassName='chat-bot-dlg' */}
+                <Offcanvas.Header closeButton>
+                    <Offcanvas.Title className="fs-6">
+                        I am your Buddy
+                    </Offcanvas.Title>
+                </Offcanvas.Header>
+                <Offcanvas.Body className="p-0 border border-1 rounded-3">
+                    <Container id='container' fluid className='text-primary'> {/* align-items-center" */}
+                        <Row className="m-0">
+                            <Col>
+                                {/* <p className='p-0 m-0 fw-lighter'>For test, Select:</p>
+                                <ul className="m-0">
+                                    <li className='p-0 fw-lighter'>Sale</li>
+                                    <li className='mx-2 fw-lighter'>Phones, TV, ...</li>
+                                    <li className='mx-4 p-0 mb-4 fw-lighter'>Televisions, remote controllers, ...</li>
+                                </ul> */}
+                            </Col>
+                        </Row>
+                        {/* badge */}
+                        <Row className="m-0">
+                            <Col className='border border-0 border-primary mx-1 text-white p-0'>
+                                {/* <div className="d-inline"> */}
+                                {/* <div key='Welcome'>
+                                    <p><b>Welcome</b>, I am Buddy and I am here to help You</p>
+                                </div> */}
+
+                                {/* <div className='border border-0 border-primary mx-0 text-white'>
+                                    {catLevels.map((catLevel) =>
+                                        <CatLevelComponent key={catLevel.level} {...catLevel} />
+                                    )}
+                                </div> */}
+
+                                <div key='history' className='history'>
+                                    {
+                                        pastEvents.map(childProps => {
+                                            switch (childProps.type) {
+                                                case 'AUTO_SUGGEST':
+                                                    return <AutoSuggestComponent {...childProps} />;
+                                                case 'QUESTION':
+                                                    return <QuestionComponent {...childProps} />;
+                                                case 'ANSWER':
+                                                    return <AnswerComponent {...childProps} />;
+                                                default:
+                                                    return <div>unknown</div>
+                                            }
+                                        })
+                                    }
+                                </div>
+
+                                {showAnswer &&
+                                    <div key="answer">
+                                        <AnswerComponent
+                                            type={'ANSWER'}
+                                            isDisabled={false}
+                                            txt={chatBotAnswer ? chatBotAnswer.answerTitle : 'no answers'}
+                                            hasMoreAnswers={hasMoreAnswers}
+                                            link={chatBotAnswer ? chatBotAnswer.answerLink : ''}
+                                        />
+                                    </div>
+                                }
+
+                                {catsSelected && !showAutoSuggest &&
+                                    <Button
+                                        key="newQuestion"
+                                        variant="secondary"
+                                        size="sm"
+                                        type="button"
+                                        onClick={() => {
+                                            setAutoSuggestId(autoSuggestId + 1);
+                                            setShowAutoSuggest(true);
+                                        }}
+                                        className='m-1 border border-1 rounded-1 py-0'
+                                    >
+                                        New Question
+                                    </Button>
+                                }
+
+                                {showAutoSuggest &&
+                                    <div className="pb-35 questions">
+                                        <AutoSuggestComponent
+                                            type={'AUTO_SUGGEST'}
+                                            isDisabled={false}
+                                            txt={autoSuggestionValue!}
+                                            link={null}
+                                        />
+                                    </div>
+                                }
+                                {/* </div> */}
+                                <div ref={scrollableRef}>dno dna</div>
+                            </Col>
+                        </Row>
+                    </Container>
+                </Offcanvas.Body>
+            </Offcanvas>
+
         </div>
     )
 };

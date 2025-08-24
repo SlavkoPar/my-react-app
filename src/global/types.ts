@@ -56,13 +56,24 @@ export class WhoWhen2Dto {
 }
 
 export interface IChatBotAnswer {
-  questionKey?: IQuestionKey;
-  topId: string;
-  id: string;
-  answerTitle: string;
-  answerLink: string | null;
-  created: IWhoWhen,
-  modified: IWhoWhen | null
+	questionKey?: IQuestionKey;
+	topId: string;
+	id: string;
+	answerTitle: string;
+	answerLink: string | null;
+	created: IWhoWhen,
+	modified: IWhoWhen | null
+}
+
+export interface INewQuestion {
+	question: IQuestion | null;
+	firstAnswer: IChatBotAnswer | null;
+	hasMoreAnswers: boolean;
+}
+
+export interface INextAnswer {
+	nextChatBotAnswer: IChatBotAnswer | null; //undefined;
+	hasMoreAnswers: boolean;
 }
 
 export interface IHistory {
@@ -76,11 +87,11 @@ export interface IHistory {
 
 export class HistoryDto {
 	constructor(history: IHistory, Workspace: string) {
-		const { questionKey, assignedAnswerKey} = history;
+		const { questionKey, assignedAnswerKey } = history;
 		this.historyDto = {
-			Workspace, 
+			Workspace,
 			QuestionKey: { TopId: questionKey.topId, Id: questionKey.id, ParentId: questionKey.parentId },
-			AnswerKey: { TopId: assignedAnswerKey.topId, Id: assignedAnswerKey.id},
+			AnswerKey: { TopId: assignedAnswerKey.topId, Id: assignedAnswerKey.id },
 			UserAction: history.userAction,
 			Created: new WhoWhen2Dto(history.created).whoWhenDto!,
 		}
@@ -143,19 +154,14 @@ export enum ROLES {
 
 export interface IGlobalState {
 	isAuthenticated: boolean | null;
-	workspace: string;
+	ws: string;
 	everLoggedIn: boolean;
-	authUser: IAuthUser;
-	canEdit: boolean,
+	canAdd: boolean,
 	isOwner: boolean,
 	isDarkMode: boolean;
 	variant: string,
 	bg: string,
-	loading: boolean;
 	error?: Error;
-	allCategoryRows: Map<string, ICategoryRow>;
-	allCategoryRowsLoaded?: number;
-	lastRouteVisited: string;
 }
 
 
@@ -191,11 +197,11 @@ export interface IHistoryFilterDto {
 
 export class HistoryFilterDto {
 	constructor(historyFilter: IHistoryFilter, Workspace: string) {
-		const { questionKey, filter, created} = historyFilter;
+		const { questionKey, filter, created } = historyFilter;
 		this.historyFilterDto = {
-			Workspace, 
+			Workspace,
 			Filter: filter,
-			QuestionKey: { Workspace, TopId: questionKey.topId, Id: questionKey.id },
+			QuestionKey: { Workspace, TopId: questionKey.topId, Id: questionKey.id, ParentId: questionKey.parentId },
 			Created: new WhoWhen2Dto(created).whoWhenDto!,
 		}
 	}
@@ -203,45 +209,6 @@ export class HistoryFilterDto {
 }
 
 
-export interface IGlobalContext {
-	globalState: IGlobalState;
-	getUser: (nickName: string) => Promise<any>;
-	OpenDB: () => Promise<any>;
-	setLastRouteVisited: (lastRouteVisited: string) => void;
-	health: () => void;
-	loadAndCacheAllCategoryRows: () => Promise<boolean>;
-	getCat: (categoryId: string) => Promise<ICategoryRow | undefined>;
-	getSubCats: (categoryId: string | null) => Promise<any>;
-	getCatsByKind: (kind: number) => Promise<ICategoryRow[]>;
-	searchQuestions: (filter: string, count: number) => Promise<IQuestionRow[]>;
-	getQuestion: (questionKey: IQuestionKey) => Promise<IQuestionEx>;
-	loadAndCacheAllGroupRows: () => Promise<boolean>;
-	getGroupRows: (categoryId: string | null) => Promise<any>;
-	globalGetGroupRow: (groupRowId: string) => Promise<IGroupRow | undefined>;
-	getGroupRowsByKind: (kind: number) => Promise<IGroupRow[]>;
-	searchAnswers: (filter: string, count: number) => Promise<IAnswerRow[]>;
-	getAnswer: (answerKey: IAnswerKey) => Promise<IAnswer | null>;
-	addHistory: (history: IHistory) => Promise<void>;
-	getAnswersRated: (questionKey: IQuestionKey) => Promise<any>;
-	addHistoryFilter: (historyFilter: IHistoryFilter) => Promise<void>;
-	setNodesReloaded: () => void;
-}
-
-export enum GlobalActionTypes {
-	SET_LOADING = 'SET_LOADING',
-	SET_FROM_LOCAL_STORAGE = "SET_FROM_LOCAL_STORAGE",
-	AUTHENTICATE = "AUTHENTICATE",
-	UN_AUTHENTICATE = "UN_AUTHENTICATE",
-	SET_DBP = "SET_DBP",
-	SET_ERROR = 'SET_ERROR',
-	DARK_MODE = "DARK_MODE",
-	LIGHT_MODE = "LIGHT_MODE",
-	SET_ALL_CATEGORY_ROWS = 'SET_ALL_CATEGORY_ROWS',
-	SET_ALL_GROUP_ROWS = 'SET_ALL_GROUP_ROWS',
-	SET_NODES_RELOADED = 'SET_NODES_RELOADED',
-	SET_QUESTION_AFTER_ASSIGN_ANSWER = 'SET_QUESTION_AFTER_ASSIGN_ANSWER',
-	SET_LAST_ROUTE_VISITED = 'SET_LAST_ROUTE_VISITED'
-}
 
 export interface ILoginUser {
 	nickName: string;
@@ -356,6 +323,8 @@ export interface IGroupData {
 
 ////////////////////
 // Role -> users
+
+
 export interface IUserData {
 	nickName: string;
 	name: string;
@@ -370,7 +339,7 @@ export interface IRoleData {
 	users?: IUserData[]
 }
 
-export type USER_ANSWER_ACTION =	'NotFixed' | 'Fixed' | 'NotClicked';
+export type USER_ANSWER_ACTION = 'NotFixed' | 'Fixed' | 'NotClicked';
 
 export interface IHistory {
 	id?: number;
