@@ -51,7 +51,7 @@ const useFetchWithMsal = (accessToken: string, msalRequest: PopupRequest | Redir
 
                 if (data) headers.append('Content-Type', 'application/json');
 
-                let options = {
+                const options = {
                     method: method,
                     headers: headers,
                     body: data ? JSON.stringify(data) : null,

@@ -12,9 +12,17 @@ import { LogLevel } from "@azure/msal-browser";
  */
 export const msalConfig = {
     auth: {
-        clientId: 'f9c4f176-9e7f-424a-b417-86da612252b8', // This is the ONLY mandatory field that you need to supply.
-        authority: 'https://TrialTenant1qGo77oT.ciamlogin.com', ///9678d2de-0c68-47d5-80f3-d1b43b726b0e', // Replace the placeholder with your tenant subdomain
-        redirectUri: '/', // You must register this URI on Microsoft Entra admin center/App Registration. Defaults to window.location.origin
+        clientId: '15c1c3ef-90d5-4baa-9d92-4c063a1186bf', // This is the ONLY mandatory field that you need to supply. //'15c1c3ef-90d5-4baa-9d92-4c063a1186bf', //
+        //authority:  '9678d2de-0c68-47d5-80f3-d1b43b726b0e',
+        //clientId: 'f9c4f176-9e7f-424a-b417-86da612252b8', //'15c1c3ef-90d5-4baa-9d92-4c063a1186bf', // This is the ONLY mandatory field that you need to supply.
+        //authority: 'https://TrialTenant1qGo77oT.ciamlogin.com', ///9678d2de-0c68-47d5-80f3-d1b43b726b0e', // Replace the placeholder with your tenant subdomain
+
+        //authority: 'https://login.microsoftonline.com/15c1c3ef-90d5-4baa-9d92-4c063a1186bf', // Replace the placeholder with your tenant info
+      
+        //clientId: '2f4006c5-c4ea-4165-846f-914b5b75685b', //'f9c4f176-9e7f-424a-b417-86da612252b8', // This is the ONLY mandatory field that you need to supply.
+        //authority:  '9678d2de-0c68-47d5-80f3-d1b43b726b0e', // Replace the placeholder with your tenant subdomain 'https://TrialTenant1qGo77oT.ciamlogin.com' 'https://login.microsoftonline.com/9678d2de-0c68-47d5-80f3-d1b43b726b0e',
+        authority:  'https://login.microsoftonline.com/9678d2de-0c68-47d5-80f3-d1b43b726b0e', //  your tenant subdomain ,
+        redirectUri: 'http://localhost:5173/src/', // You must register this URI on Microsoft Entra admin center/App Registration. Defaults to window.location.origin // http://localhost:5173/src
         postLogoutRedirectUri: '/', // Indicates the page to navigate after logout.
     },
     cache: {
@@ -58,10 +66,10 @@ export const msalConfig = {
  */
 export const protectedResources = {
     KnowledgeAPI: {
-        endpointCategoryRow: `${import.meta.env.REACT_APP_API_URL}/CategoryRow`,
-        endpointQuestion: `${import.meta.env.REACT_APP_API_URL}/Question`,
-        endpointHistory: `${import.meta.env.REACT_APP_API_URL}/History`,
-        endpointHistoryFilter: `${import.meta.env.REACT_APP_API_URL}/HistoryFilter`,
+        endpointCategoryRow: `${import.meta.env.VITE_APP_API_URL}/CategoryRow`,
+        endpointQuestion: `${import.meta.env.VITE_APP_API_URL}/Question`,
+        endpointHistory: `${import.meta.env.VITE_APP_API_URL}/History`,
+        endpointHistoryFilter: `${import.meta.env.VITE_APP_API_URL}/HistoryFilter`,
         scopes: {
             read: ['api://91385bcd-f531-4b1c-8b3d-2105439f0a8a/ToDoList.Read'],
             write: ['api://91385bcd-f531-4b1c-8b3d-2105439f0a8a/ToDoList.ReadWrite']
