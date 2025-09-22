@@ -11,7 +11,7 @@ import ChatBotDlg from './ChatBotDlg'
 //import { InteractionType, type PublicClientApplication } from '@azure/msal-browser'
 // import { useMsal, useMsalAuthentication } from '@azure/msal-react'
 
-import { InteractionRequiredAuthError, PublicClientApplication, type SsoSilentRequest } from '@azure/msal-browser';
+import { InteractionRequiredAuthError, PublicClientApplication } from '@azure/msal-browser';
 // import { type AccountFilter } from '@azure/msal-common/browser';
 
 function App({ msalInstance }: { msalInstance: PublicClientApplication }) {
