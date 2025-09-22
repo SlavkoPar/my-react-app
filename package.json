@@ -1,8 +1,8 @@
 {
-  "homepage": "https://slavkopar.github.io/my-react-app/src/",
+  "homepage": "https://slavkopar.github.io/my-react-app/",
   "name": "my-react-app",
   "private": true,
-  "version": "0.0.0",
+  "version": "1.0.1",
   "type": "module",
   "scripts": {
     "dev": "vite --host",

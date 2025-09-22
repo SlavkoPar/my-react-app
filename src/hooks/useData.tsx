@@ -114,8 +114,7 @@ export const useData = (ws: string): [
       const cats = new Map<string, ICat>();
       try {
         console.time();
-        //const url = `${protectedResources.KnowledgeAPI.endpointCategoryRow}/${workspace}/allCats`;
-        const url = `${import.meta.env.VITE_KNOWLEDGE_LIB_API_URL}/CategoryRow/${workspace}/allCats`;
+        const url = `${protectedResources.KnowledgeAPI.endpointCategoryRow}/${workspace}/allCats`;
         Execute("GET", url, null)
           .then((value: object) => {
             console.timeEnd();
@@ -134,12 +133,12 @@ export const useData = (ws: string): [
               cats.set(id, cat);
             })
             setAllCats(cats);
+            resolve(cats);
           });
       }
       catch (error: unknown) {
         console.log(error)
       }
-      resolve(cats);
     });
   }, [workspace]);
 
@@ -190,6 +189,7 @@ export const useData = (ws: string): [
         console.log(error);
         const questionEx: IQuestionEx = {
           question: null,
+          firstAnswer: null,
           msg: "Problemos"
         }
         resolve(questionEx);
@@ -208,7 +208,7 @@ export const useData = (ws: string): [
           .then((x: object) => {
             const dtosEx: IQuestionRowDtosEx = x as IQuestionRowDtosEx
             const { questionRowDtos, msg } = dtosEx;
-            console.log('questionRowDtos:', { dtos: dtosEx }, protectedResources.KnowledgeAPI.endpointCategory);
+            console.log('questionRowDtos:', { dtos: dtosEx }, protectedResources.KnowledgeAPI.endpointCategoryRow);
             console.timeEnd();
             if (questionRowDtos) {
               const questionRows: IQuestionRow[] = questionRowDtos.map((dto: IQuestionRowDto) => {

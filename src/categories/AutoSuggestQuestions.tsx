@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { type JSX } from 'react';
 import Autosuggest from 'react-autosuggest';
 import AutosuggestHighlightMatch from "autosuggest-highlight/match";
 import AutosuggestHighlightParse from "autosuggest-highlight/parse";
@@ -6,7 +6,7 @@ import AutosuggestHighlightParse from "autosuggest-highlight/parse";
 
 import { debounce, escapeRegexCharacters } from '../utilities';
 import './AutoSuggestQuestions.css';
-import { type ICat, type IQuestionKey, QuestionKey } from './types';
+import { type ICat, type IQuestionKey, type IQuestionRow, QuestionKey } from './types';
 
 
 interface ICatMy {
@@ -27,10 +27,10 @@ interface ICatSection {
 
 // autoFocus does the job
 //let inputAutosuggest = createRef<HTMLInputElement>();
-interface ICatIdTitle {
-	id: string;
-	title: string;
-}
+// interface ICatIdTitle {
+// 	id: string;
+// 	title: string;
+// }
 
 interface IProps {
 	tekst: string | undefined,
@@ -317,11 +317,11 @@ export class AutoSuggestQuestions extends React.Component<IProps, IState> {
 		});
 	};
 
-	protected onSuggestionSelected(event: React.FormEvent<any>, data: Autosuggest.SuggestionSelectedEventData<ICat>): void {
+	protected onSuggestionSelected(event: React.FormEvent<unknown>, data: Autosuggest.SuggestionSelectedEventData<ICat>): void {
 		const question: ICat = data.suggestion;
 		const { topId, parentId, id} = question;
 		// alert(`Selected question is ${question.questionId} (${question.text}).`);
-		this.props.onSelectQuestion({ topId, parentId, id }, this.state.value);
+		this.props.onSelectQuestion({ topId, parentId: parentId!, id }, this.state.value);
 	}
 
 	/*

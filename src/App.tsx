@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react'
-import reactLogo from './assets/react.svg'
-import viteLogo from '/vite.svg'
+//import reactLogo from './assets/react.svg'
+//import viteLogo from '/vite.svg'
 import './App.css'
 import './categories/AutoSuggest.css'
 import './categories/AutoSuggestQuestions.css'
@@ -9,10 +9,10 @@ import Button from 'react-bootstrap/Button'
 // import { protectedResources } from "authConfig";
 import ChatBotDlg from './ChatBotDlg'
 //import { InteractionType, type PublicClientApplication } from '@azure/msal-browser'
-import { useMsal, useMsalAuthentication } from '@azure/msal-react'
+// import { useMsal, useMsalAuthentication } from '@azure/msal-react'
 
-import { AuthError, InteractionRequiredAuthError, InteractionType, PublicClientApplication, type SsoSilentRequest, type AccountInfo } from '@azure/msal-browser';
-import { type AccountFilter } from '@azure/msal-common/browser';
+import { InteractionRequiredAuthError, PublicClientApplication, type SsoSilentRequest } from '@azure/msal-browser';
+// import { type AccountFilter } from '@azure/msal-common/browser';
 
 function App({ msalInstance }: { msalInstance: PublicClientApplication }) {
 

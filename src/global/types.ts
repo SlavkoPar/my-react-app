@@ -1,5 +1,5 @@
 // Define the Global State
-import type { IAssignedAnswerDtoKey, IAssignedAnswerKey, ICategory, ICategoryKey, ICategoryRow, ICategoryRowDto, IKeyExpanded, IQuestion, IQuestionDtoKey, IQuestionEx, IQuestionKey, IQuestionRow } from '../categories/types';
+import type { IAssignedAnswerDtoKey, IAssignedAnswerKey, IQuestion, IQuestionDtoKey, IQuestionKey } from '../categories/types';
 //import { IOption } from 'common/types';
 
 export interface IWhoWhen {
@@ -235,7 +235,7 @@ export interface IJoinToWorkspace {
 }
 
 
-export type ActionMap<M extends Record<string, any>> = {
+export type ActionMap<M extends Record<string, unknown>> = {
 	[Key in keyof M]: M[Key] extends undefined
 	? {
 		type: Key;
@@ -246,9 +246,24 @@ export type ActionMap<M extends Record<string, any>> = {
 	}
 };
 
+export enum GlobalActionTypes {
+	SET_LOADING = 'SET_LOADING',
+	SET_FROM_LOCAL_STORAGE = "SET_FROM_LOCAL_STORAGE",
+	AUTHENTICATE = "AUTHENTICATE",
+	UN_AUTHENTICATE = "UN_AUTHENTICATE",
+	SET_DBP = "SET_DBP",
+	SET_ERROR = 'SET_ERROR',
+	DARK_MODE = "DARK_MODE",
+	LIGHT_MODE = "LIGHT_MODE",
+	SET_ALL_CATEGORY_ROWS = 'SET_ALL_CATEGORY_ROWS',
+	SET_ALL_GROUP_ROWS = 'SET_ALL_GROUP_ROWS',
+	SET_NODES_RELOADED = 'SET_NODES_RELOADED',
+	SET_QUESTION_AFTER_ASSIGN_ANSWER = 'SET_QUESTION_AFTER_ASSIGN_ANSWER',
+	SET_LAST_ROUTE_VISITED = 'SET_LAST_ROUTE_VISITED'
+}
+
 export type GlobalPayload = {
-	[GlobalActionTypes.SET_LOADING]: {
-	};
+	[GlobalActionTypes.SET_LOADING]: object;
 
 	[GlobalActionTypes.SET_FROM_LOCAL_STORAGE]: {
 		locStorage: ILocStorage
