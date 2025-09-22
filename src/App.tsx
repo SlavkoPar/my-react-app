@@ -41,63 +41,9 @@ function App({ msalInstance }: { msalInstance: PublicClientApplication }) {
 
   //const { accounts } = useMsal();
 
-  //const account = accounts[0];
-
-  //silentRequest.loginHint = account.loginHint;
-
-  //const { loginRedirect, getAccount } = msalInstance;
 
 
-  // const account: AccountInfo = {
-  //   homeAccountId: '15c1c3ef-90d5-4baa-9d92-4c063a1186bf.9678d2de-0c68-47d5-80f3-d1b43b726b0e',
-  //   environment: 'trialtenant1qgo77ot.ciamlogin.com',
-  //   tenantId: '9678d2de-0c68-47d5-80f3-d1b43b726b0e',
-  //   username: 'stamena@TrialTenant1qGo77oT.onmicrosoft.com',
-  //   localAccountId: '60dfd188-9acd-4749-bc9c-7534da2a1ef1',
-  //   // loginHint?: string;
-  //   name: 'Stamena Parezanin'
-  // }
-
-  /*
-  {
-    "homeAccountId": "60dfd188-9acd-4749-bc9c-7534da2a1ef1.9678d2de-0c68-47d5-80f3-d1b43b726b0e",
-      "environment": "trialtenant1qgo77ot.ciamlogin.com",
-        "tenantId": "9678d2de-0c68-47d5-80f3-d1b43b726b0e",
-          "username": "stamena@TrialTenant1qGo77oT.onmicrosoft.com",
-            "localAccountId": "60dfd188-9acd-4749-bc9c-7534da2a1ef1",
-              "name": "Stamena Parezanin",
-                "authorityType": "MSSTS",
-                  "tenantProfiles": { },
-    "idTokenClaims": {
-      "aud": "f9c4f176-9e7f-424a-b417-86da612252b8",
-        "iss": "https://9678d2de-0c68-47d5-80f3-d1b43b726b0e.ciamlogin.com/9678d2de-0c68-47d5-80f3-d1b43b726b0e/v2.0",
-          "iat": 1757592994,
-            "nbf": 1757592994,
-              "exp": 1757596894,
-                "name": "Stamena Parezanin",
-                  "nonce": "019938b9-2f56-7f45-a650-f4fad166e8e9",
-                    "oid": "60dfd188-9acd-4749-bc9c-7534da2a1ef1",
-                      "preferred_username": "stamena@TrialTenant1qGo77oT.onmicrosoft.com",
-                        "rh": "1.AbMA3tJ4lmgM1UeA89G0O3JrDnbxxPl_nkpCtBeG2mEiUrizAOGzAA.",
-                          "sid": "008b09d9-9de8-6d76-b75b-85fcd9d20d1b",
-                            "sub": "Cu06M5DXjiUKKWWK4BD8vVQzM74tj26Y6GlO3mTbV-k",
-                              "tid": "9678d2de-0c68-47d5-80f3-d1b43b726b0e",
-                                "uti": "rBOIuv6wJkyApNrDLnANAA",
-                                  "ver": "2.0"
-    },
-    "idToken": "eyJ0eXAiOiJKV1QiLCJhbGciOiJSUzI1NiIsImtpZCI6Im1VRzZ2WW5SbG9mdUx4Y2lacnU3U3B0ZjZOTSJ9.eyJhdWQiOiJmOWM0ZjE3Ni05ZTdmLTQyNGEtYjQxNy04NmRhNjEyMjUyYjgiLCJpc3MiOiJodHRwczovLzk2NzhkMmRlLTBjNjgtNDdkNS04MGYzLWQxYjQzYjcyNmIwZS5jaWFtbG9naW4uY29tLzk2NzhkMmRlLTBjNjgtNDdkNS04MGYzLWQxYjQzYjcyNmIwZS92Mi4wIiwiaWF0IjoxNzU3NTkyOTk0LCJuYmYiOjE3NTc1OTI5OTQsImV4cCI6MTc1NzU5Njg5NCwibmFtZSI6IlN0YW1lbmEgUGFyZXphbmluIiwibm9uY2UiOiIwMTk5MzhiOS0yZjU2LTdmNDUtYTY1MC1mNGZhZDE2NmU4ZTkiLCJvaWQiOiI2MGRmZDE4OC05YWNkLTQ3NDktYmM5Yy03NTM0ZGEyYTFlZjEiLCJwcmVmZXJyZWRfdXNlcm5hbWUiOiJzdGFtZW5hQFRyaWFsVGVuYW50MXFHbzc3b1Qub25taWNyb3NvZnQuY29tIiwicmgiOiIxLkFiTUEzdEo0bG1nTTFVZUE4OUcwTzNKckRuYnh4UGxfbmtwQ3RCZUcybUVpVXJpekFPR3pBQS4iLCJzaWQiOiIwMDhiMDlkOS05ZGU4LTZkNzYtYjc1Yi04NWZjZDlkMjBkMWIiLCJzdWIiOiJDdTA2TTVEWGppVUtLV1dLNEJEOHZWUXpNNzR0ajI2WTZHbE8zbVRiVi1rIiwidGlkIjoiOTY3OGQyZGUtMGM2OC00N2Q1LTgwZjMtZDFiNDNiNzI2YjBlIiwidXRpIjoickJPSXV2NndKa3lBcE5yRExuQU5BQSIsInZlciI6IjIuMCJ9.baptemjN8YMU2UsMvPkhK5hGZ2PbXvtWJF6zkWCymUvkmvqgx62VDWKcPAoB_gQiOhicxu4TuKQVa5vMIB-CwwiBzUMNDxFeK7lUfNN29OlUPJWukB_KWVOOwH_pmPp1mJTfNfPoE30O6-cgJ6qZS7R0CnmG4uWHt-ODCCIpiT2dIpV4Z_pFjkq8VIjnLiwZAHRxsuYpfOyqigRfM2po--dxnWAEkFYrJCE_7MoD-tkm6sk031-56iIL-adjDa5fX-ZAWQnO9_v6GJw1ZJ80c3v1WausMtLYe1xi-jBzXMgEUdpppYPA8FEpyGE5PyNJbsxUPbLKTysUY4Zj72tQOg"
-  }
-    */
-
-
-  //const accounts2: AccountInfo[] = msalInstance.getAllAccounts();
-
-  const [silentRequest] = useState<SsoSilentRequest>({
-    //loginHint: "9678d2de-0c68-47d5-80f3-d1b43b726b0e",
-    //account, //: msalInstance.getAllAccounts()[0],
-    loginHint: "slavkopar@outlook.com", //"stamena@TrialTenant1qGo77oT.onmicrosoft.com", //"slavkopar@outlook.com", //
-    scopes: ['ToDoList.Read', 'ToDoList.ReadWrite']
-  });
+  
 
 
   //const { login, result, error } = useMsalAuthentication(InteractionType.Silent, silentRequest);
@@ -147,7 +93,7 @@ function App({ msalInstance }: { msalInstance: PublicClientApplication }) {
       }    //}
 
     })()
-  }, [silentRequest, msalInstance]);
+  }, [msalInstance]);
 
 
   const [show, setShow] = useState(false);
