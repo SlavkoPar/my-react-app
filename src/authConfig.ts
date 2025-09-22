@@ -66,10 +66,10 @@ export const msalConfig = {
  */
 export const protectedResources = {
     KnowledgeAPI: {
-        endpointCategoryRow: `${import.meta.env.VITE_APP_API_URL}/CategoryRow`,
-        endpointQuestion: `${import.meta.env.VITE_APP_API_URL}/Question`,
-        endpointHistory: `${import.meta.env.VITE_APP_API_URL}/History`,
-        endpointHistoryFilter: `${import.meta.env.VITE_APP_API_URL}/HistoryFilter`,
+        endpointCategoryRow: `${import.meta.env.VITE_KNOWLEDGE_LIB_API_URL}/CategoryRow`,
+        endpointQuestion: `${import.meta.env.VITE_KNOWLEDGE_LIB_API_URL}/Question`,
+        endpointHistory: `${import.meta.env.VITE_KNOWLEDGE_LIB_API_URL}/History`,
+        endpointHistoryFilter: `${import.meta.env.VITE_KNOWLEDGE_LIB_API_URL}/HistoryFilter`,
         scopes: {
             read: ['api://91385bcd-f531-4b1c-8b3d-2105439f0a8a/ToDoList.Read'],
             write: ['api://91385bcd-f531-4b1c-8b3d-2105439f0a8a/ToDoList.ReadWrite']

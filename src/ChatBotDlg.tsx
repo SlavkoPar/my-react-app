@@ -38,16 +38,17 @@ interface IProps {
     onHide: () => void;
 }
 
+const isDarkMode = true;
 
 const ChatBotDlg = ({ show, onHide }: IProps) => {
     //let { source, tekst, email } = useParams<ChatBotParams>();
-    let tekst = 'Pera';
+    let tekst = 'rem';
     const [autoSuggestionValue, setAutoSuggestionValue] = useState(tekst!)
     //    const [setNewQuestion, getCurrQuestion, getNextChatBotAnswer] = useAI([]);
 
     const [
         allCats, loadCats,
-        getQuestion, selectedQuestion, firstAnswer, hasMoreAnswers, getNextAnswer,
+        getQuestion, selectedQuestion, hasMoreAnswers, getNextAnswer,
         searchQuestions,
         addHistory, addHistoryFilter
     ] = useData("DEMO");
@@ -59,6 +60,8 @@ const ChatBotDlg = ({ show, onHide }: IProps) => {
     }, [loadCats])
 
     //const [selectedQuestion, setSelectedQuestion] = useState<IQuestion | null>(null);
+    //const [hasMoreAnswers, setHasMoreAnswers] = useState<boolean>(false);
+    
     const [autoSuggestId, setAutoSuggestId] = useState<number>(1);
     const [showAnswer, setShowAnswer] = useState(false);
     const [chatBotAnswer, setChatBotAnswer] = useState<IChatBotAnswer | null>(null);
@@ -85,8 +88,9 @@ const ChatBotDlg = ({ show, onHide }: IProps) => {
     // 	})()
     // }, [])
 
-    /*
+
     const onEntering = async (node: HTMLElement, isAppearing: boolean): Promise<unknown> => {
+        /*
         setCatLevels([]);
         const parentId = 'MTS'; // null
         const res = await getSubCats(parentId);
@@ -102,9 +106,9 @@ const ChatBotDlg = ({ show, onHide }: IProps) => {
                 subCatIdSelected: null
             }
         ]))
-
+            */
     }
-    */
+
 
     const scrollableRef = useRef<HTMLDivElement>(null);
 
@@ -159,7 +163,7 @@ const ChatBotDlg = ({ show, onHide }: IProps) => {
         }
 
         const questionEx: IQuestionEx = await getQuestion(questionKey);
-        const { question } = questionEx;
+        const { question, firstAnswer } = questionEx;
         if (!question) {
             //alert(questionEx.msg)
             return;
@@ -184,9 +188,9 @@ const ChatBotDlg = ({ show, onHide }: IProps) => {
 
         setAutoSuggestId((autoSuggestId) => autoSuggestId + 1);
         setShowAutoSuggest(false);
-        setSelectedQuestion(question);
+        // setSelectedQuestion(question);
         setShowAnswer(true);
-        setHasMoreAnswers(hasMoreAnswers);
+        //setHasMoreAnswers(hasMoreAnswers);
         //setAnswerId((answerId) => answerId + 1);
         setChatBotAnswer(firstAnswer);
         // // salji kasnije kad klikne na Fixed

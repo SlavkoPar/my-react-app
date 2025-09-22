@@ -1,4 +1,4 @@
-import type { ActionMap, IRecord, IDto, IDtoKey, IWhoWhenDto, IWhoWhen } from '../global/types';
+import type { ActionMap, IRecord, IDto, IDtoKey, IWhoWhenDto, IWhoWhen, IChatBotAnswer } from '../global/types';
 import { Dto2WhoWhen, WhoWhen2Dto } from '../global/types';
 import type { IAnswer, IAnswerKey } from './groups/types';
 
@@ -147,23 +147,23 @@ export interface IQuestionKey {
 	id: string;
 }
 
-// export interface IQuestionRow extends IQuestionKey, IRecord {
-// 	title: string;
-// 	numOfAssignedAnswers: number;
-// 	categoryTitle?: string;
-// 	// isSelected?: boolean;
-// 	included: boolean;
-// }
+export interface IQuestionRow extends IQuestionKey, IRecord {
+	title: string;
+	numOfAssignedAnswers: number;
+	categoryTitle?: string;
+	// isSelected?: boolean;
+	included: boolean;
+}
 
-// export interface IQuestion extends IQuestionRow {
-// 	assignedAnswers: IAssignedAnswer[];
-// 	relatedFilters: IRelatedFilter[]
-// 	numOfRelatedFilters: number,
-// 	source: number;
-// 	status: number;
-// 	fromUserAssignedAnswer?: IFromUserAssignedAnswer[];
-// 	categoryTitle?: string;
-// }
+export interface IQuestion extends IQuestionRow {
+	assignedAnswers: IAssignedAnswer[];
+	relatedFilters: IRelatedFilter[]
+	numOfRelatedFilters: number,
+	source: number;
+	status: number;
+	fromUserAssignedAnswer?: IFromUserAssignedAnswer[];
+	categoryTitle?: string;
+}
 
 export interface ICatDto {
 	TopId: string;
@@ -511,6 +511,7 @@ export interface IQuestionDtoEx {
 
 export interface IQuestionEx {
 	question: IQuestion | null;
+	firstAnswer: IChatBotAnswer | null;
 	msg: string;
 }
 

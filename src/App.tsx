@@ -120,24 +120,27 @@ function App({ msalInstance }: { msalInstance: PublicClientApplication }) {
     })
     */
 
-  const { login, result, error: msalError } = useMsalAuthentication(InteractionType.Silent, silentRequest);
+  //const { login, result, error: msalError } = useMsalAuthentication(InteractionType.Silent, silentRequest);
 
   useEffect(() => {
     (async () => {
       try {
+        /*
         const myAccounts: AccountInfo[] = msalInstance.getAllAccounts();
-        
         const loginResponse = await msalInstance.ssoSilent(silentRequest);
         console.log({ loginResponse })
+        */
       }
       catch (err) {
         if (err instanceof InteractionRequiredAuthError) {
+          /*
           const loginResponse = await msalInstance
             .loginPopup(silentRequest)
             .catch((error: unknown) => {
               console.log(error)
               // handle error
             });
+          */
         } else {
           // handle error
         }
@@ -153,11 +156,11 @@ function App({ msalInstance }: { msalInstance: PublicClientApplication }) {
   const handleShow = () => setShow(true);
 
 
-  const { accounts } = useMsal();
+  //const { accounts } = useMsal();
   //const myAccount: AccountInfo|null = getAccount(accountFilter): AccountInfo | null;
-  if (accounts.length === 0)
+  //if (accounts.length === 0)
     //if (!myAccount)
-    return "Loading";
+    //return "Loading";
 
   return (
     <>
@@ -173,7 +176,7 @@ function App({ msalInstance }: { msalInstance: PublicClientApplication }) {
         {/* <button onClick={() => setCount((count) => count + 1)}>
           count is {count}
         </button> */}
-        <p>Signed in as: {accounts[0]?.username}</p>
+        {/*<p>Signed in as: {accounts[0]?.username}</p>*/}
       </div>
 
       <Button variant="primary" onClick={handleShow}>

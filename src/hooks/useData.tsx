@@ -52,21 +52,21 @@ export const useData = (ws: string): [
   const [allCats, setAllCats] = useState<Map<string, ICat> | null>(null);
   const [newQuestion, setNewQuestion] = useState<INewQuestion | null>(null);
   const [selectedQuestion, setSelectedQuestion] = useState<IQuestion | null>(null);
-  const [firstAnswer, setFirstAnswer] = useState<IChatBotAnswer | null>(null);
   const [hasMoreAnswers, setHasMoreAnswers] = useState(false);
   const [nextAnswer, setNextAnswer] = useState<IChatBotAnswer | null>(null);
   const [index, setIndex] = useState(-1);
 
   const Execute = async (method: string, endpoint: string, data: object | null = null): Promise<object> => {
-    const accessToken = localStorage.getItem("accessToken");
+    //const accessToken = localStorage.getItem("accessToken");
+    const accessToken = "1234567";
     if (accessToken) {
       try {
-        console.log({ accessToken })
+        //console.log({ accessToken })
         let response = null;
 
         const headers = new Headers();
-        const bearer = `Bearer ${accessToken}`;
-        headers.append("Authorization", bearer);
+        //const bearer = `Bearer ${accessToken}`;
+        //headers.append("Authorization", bearer);
 
         if (data) headers.append('Content-Type', 'application/json');
 
@@ -114,7 +114,8 @@ export const useData = (ws: string): [
       const cats = new Map<string, ICat>();
       try {
         console.time();
-        const url = `${protectedResources.KnowledgeAPI.endpointCategoryRow}/${workspace}/allCats`;
+        //const url = `${protectedResources.KnowledgeAPI.endpointCategoryRow}/${workspace}/allCats`;
+        const url = `${import.meta.env.VITE_KNOWLEDGE_LIB_API_URL}/CategoryRow/${workspace}/allCats`;
         Execute("GET", url, null)
           .then((value: object) => {
             console.timeEnd();
@@ -157,26 +158,25 @@ export const useData = (ws: string): [
             const { questionDto, msg } = x;
             if (questionDto) {
               const question = new Question(questionDto).question;
-              let newQuestion = null;
+              let newQ: INewQuestion | null = null;
               if (question) {
                 const { assignedAnswers } = question;
                 if (assignedAnswers && assignedAnswers.length > 0) {
                   const assignedAnswer = assignedAnswers[0];
-                  const firstAnswer = new ChatBotAnswer(assignedAnswer).chatBotAnswer;
-                  const hasMoreAnswers = assignedAnswers.length > 1;
-                  setFirstAnswer(firstAnswer);
-                  setHasMoreAnswers(hasMoreAnswers);
-                  setIndex(0);
-                  newQuestion = {
+                  const firstA = new ChatBotAnswer(assignedAnswer).chatBotAnswer;
+                  const hasMoreAs = assignedAnswers.length > 1;
+                  newQ = {
                     question,
-                    firstAnswer,
-                    hasMoreAnswers
+                    firstAnswer: firstA,
+                    hasMoreAnswers: hasMoreAs
                   }
+                  setHasMoreAnswers(hasMoreAs);
+                  setIndex(0);
                 }
               }
-              setNewQuestion(newQuestion);
+              setNewQuestion(newQ);
               setSelectedQuestion(question);
-              resolve({ question, msg: '' } as IQuestionEx)
+              resolve({ ...newQ, msg: '' } as IQuestionEx)
             }
             else {
               setNewQuestion(null);
@@ -346,7 +346,7 @@ export const useData = (ws: string): [
 
   return [
     allCats, loadCats,
-    getQuestion, selectedQuestion, firstAnswer, hasMoreAnswers, getNextAnswer,
+    getQuestion, selectedQuestion, hasMoreAnswers, getNextAnswer,
     searchQuestions,
     addHistory, addHistoryFilter
   ]
