@@ -11,10 +11,11 @@ import ChatBotDlg from './ChatBotDlg'
 //import { InteractionType, type PublicClientApplication } from '@azure/msal-browser'
 // import { useMsal, useMsalAuthentication } from '@azure/msal-react'
 
-import { InteractionRequiredAuthError, PublicClientApplication } from '@azure/msal-browser';
+import { InteractionRequiredAuthError } from '@azure/msal-browser';
 // import { type AccountFilter } from '@azure/msal-common/browser';
 
-function App({ msalInstance }: { msalInstance: PublicClientApplication }) {
+//function App({ msalInstance }: { msalInstance: PublicClientApplication }) {
+function App() {
 
   // const accounts: AccountInfo[] = msalInstance.getAllAccounts();
   // const account: AccountInfo = accounts[0];
@@ -93,7 +94,7 @@ function App({ msalInstance }: { msalInstance: PublicClientApplication }) {
       }    //}
 
     })()
-  }, [msalInstance]);
+  }, []);
 
 
   const [show, setShow] = useState(false);
@@ -119,6 +120,7 @@ function App({ msalInstance }: { msalInstance: PublicClientApplication }) {
         </a>
       </div> */}
       <div className="card">
+        BILJA
         {/* <button onClick={() => setCount((count) => count + 1)}>
           count is {count}
         </button> */}
