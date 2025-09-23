@@ -1,6 +1,6 @@
-import type { ActionMap, IRecord, IDto, IDtoKey, IWhoWhenDto, IWhoWhen, IChatBotAnswer } from '../global/types';
+import type { ActionMap, IRecord, IDtoKey, IWhoWhenDto, IWhoWhen, IChatBotAnswer } from '../global/types';
 import { Dto2WhoWhen, WhoWhen2Dto } from '../global/types';
-import type { IAnswer, IAnswerKey } from './groups/types';
+// import type { IAnswer, IAnswerKey } from '../groups/types';
 
 export type FormMode = 'None' | 'AddingCategory' | 'ViewingCategory' | 'EditingCategory' |
 	'DeletingCategory' | 'AddingQuestion' | 'ViewingQuestion' | 'EditingQuestion' | 'DeletingQuestion' |
@@ -52,8 +52,8 @@ export interface IKeyExpanded {
 // 	TitlesUpTheTree?: string;
 // }
 
-/*
-export interface ICategoryRow extends ICategoryKey, IRecord {
+
+export interface ICategoryRow extends ICategoryKey { //}, IRecord {
 	kind: number;
 	title: string;
 	link: string | null;
@@ -76,7 +76,7 @@ export interface ICategory extends ICategoryRow {
 
 export class CategoryRowDto {
 	constructor(categoryRow: ICategoryRow, Workspace: string) {
-		const { topId, id, parentId, modified } = categoryRow;
+		const { topId, id, parentId } = categoryRow;
 		this.categoryRowDto = {
 			Workspace,
 			TopId: topId,
@@ -92,8 +92,8 @@ export class CategoryRowDto {
 			NumOfQuestions: 0,
 			QuestionRowDtos: [],
 			Level: 0,
-			Kind: 0,
-			Modified: modified ? new WhoWhen2Dto(modified).whoWhenDto! : undefined
+			Kind: 0
+			//Modified: modified ? new WhoWhen2Dto(modified).whoWhenDto! : undefined
 		}
 	}
 	categoryRowDto: ICategoryRowDto;
@@ -127,7 +127,6 @@ export class CategoryRow {
 	}
 	categoryRow: ICategoryRow;
 }
-	*/
 
 
 /////////////////////////////////////
@@ -149,10 +148,10 @@ export interface IQuestionKey {
 
 export interface IQuestionRow extends IQuestionKey, IRecord {
 	title: string;
-	numOfAssignedAnswers: number;
+	numOfAssignedAnswers?: number;
 	categoryTitle?: string;
 	// isSelected?: boolean;
-	included: boolean;
+	included?: boolean;
 }
 
 export interface IQuestion extends IQuestionRow {
@@ -275,12 +274,6 @@ export interface IVariation {
 	name: string;
 }
 
-// ICategory rather than ICategoryRow
-export const IsCategory = (obj: any): boolean => typeof obj === 'object' && obj !== null &&
-	obj.hasOwnProperty('doc1') && typeof obj.doc1 === 'string';
-
-
-
 export class QuestionRow {
 	constructor(rowDto: IQuestionRowDto) { //, parentId: string) {
 		const { TopId, ParentId, Id, NumOfAssignedAnswers, Title, CategoryTitle, Created, Modified, Included } = rowDto;
@@ -348,7 +341,7 @@ export class CategoryKey {
 export class Category {
 	constructor(dto: ICategoryDto) {
 		const { TopId, Id, ParentId, Kind, Title, Link, Header, Level, Variations, NumOfQuestions,
-			HasSubCategories, SubCategoryRowDtos, Created, Modified, QuestionRowDtos, IsExpanded, Doc1 } = dto;
+			HasSubCategories, SubCategoryRowDtos, QuestionRowDtos, IsExpanded, Doc1 } = dto;
 
 		const categoryRows = SubCategoryRowDtos
 			? SubCategoryRowDtos.map((rowDto: ICategoryRowDto) => new CategoryRow(rowDto).categoryRow)
@@ -370,10 +363,10 @@ export class Category {
 			variations: Variations ?? [],
 			hasSubCategories: HasSubCategories!,
 			categoryRows,
-			created: new Dto2WhoWhen(Created!).whoWhen,
-			modified: Modified
-				? new Dto2WhoWhen(Modified).whoWhen
-				: undefined,
+			//created: new Dto2WhoWhen(Created!).whoWhen,
+			// modified: Modified
+			// 	? new Dto2WhoWhen(Modified).whoWhen
+			// 	: undefined,
 			numOfQuestions: NumOfQuestions!,
 			questionRows,
 			isExpanded: IsExpanded === true,
@@ -385,7 +378,7 @@ export class Category {
 
 export class CategoryDto {
 	constructor(category: ICategory, Workspace: string) {
-		const { topId, id, parentId, kind, title, link, header, level, variations, created, modified, doc1 } = category;
+		const { topId, id, parentId, kind, title, link, header, level, variations, doc1 } = category;
 		this.categoryDto = {
 			Workspace,
 			TopId: topId,
@@ -401,8 +394,8 @@ export class CategoryDto {
 			NumOfQuestions: 0,
 			QuestionRowDtos: [],
 			Variations: variations,
-			Created: new WhoWhen2Dto(created).whoWhenDto!,
-			Modified: new WhoWhen2Dto(modified).whoWhenDto!,
+			//Created: new WhoWhen2Dto(created).whoWhenDto!,
+			//Modified: new WhoWhen2Dto(modified).whoWhenDto!,
 			Doc1: doc1
 		}
 	}
@@ -689,13 +682,13 @@ export interface IAssignedAnswerDtoEx {
 
 export class AssignedAnswerDto {
 	constructor(assignedAnswer: IAssignedAnswer) {
-		const { topId, id, answerTitle, answerLink, created, modified } = assignedAnswer;
+		const { topId, id, answerTitle, answerLink } = assignedAnswer;
 		this.assignedAnswerDto = {
 			TopId: topId,
 			Id: id,
 			AnswerTitle: answerTitle ?? '',
-			AnswerLink: answerTitle ?? '',
-			Created: new WhoWhen2Dto(created).whoWhenDto!
+			AnswerLink: answerLink ?? '',
+			//Created: new WhoWhen2Dto(created).whoWhenDto!
 			//Modified: new WhoWhen2Dto(modified).whoWhenDto
 		}
 	}

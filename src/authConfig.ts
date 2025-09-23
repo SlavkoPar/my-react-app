@@ -35,7 +35,7 @@ export const msalConfig = {
              * Below you can configure MSAL.js logs. For more information, visit:
              * https://docs.microsoft.com/azure/active-directory/develop/msal-logging-js
              */
-            loggerCallback: (level, message, containsPii) => {
+            loggerCallback: (level: unknown, message: unknown, containsPii: unknown) => {
                 if (containsPii) {
                     return;
                 }

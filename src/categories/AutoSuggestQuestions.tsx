@@ -1,5 +1,5 @@
-import React, { type JSX } from 'react';
-import Autosuggest from 'react-autosuggest';
+import React, { type FormEvent, type JSX } from 'react';
+import Autosuggest, { type SuggestionsFetchRequestedParams } from 'react-autosuggest';
 import AutosuggestHighlightMatch from "autosuggest-highlight/match";
 import AutosuggestHighlightParse from "autosuggest-highlight/parse";
 //import { isMobile } from 'react-device-detect'
@@ -17,14 +17,14 @@ interface ICatMy {
 	questionRows: IQuestionRow[]
 }
 
+
 interface ICatSection {
 	id: string | null,
 	categoryTitle: string,
 	parentCategoryUp: string,
 	categoryParentTitle: string, // TODO ???
-	questionRows: ICat[]
+	questionRows: IQuestionRow[]
 }
-
 // autoFocus does the job
 //let inputAutosuggest = createRef<HTMLInputElement>();
 // interface ICatIdTitle {
@@ -36,7 +36,7 @@ interface IProps {
 	tekst: string | undefined,
 	onSelectQuestion: (questionKey: IQuestionKey, underFilter: string) => void,
 	allCats: Map<string, ICat>,
-	searchQuestions: (filter: string, count: number) => Promise<ICat[]>
+	searchQuestions: (filter: string, count: number) => Promise<IQuestionRow[]>
 }
 
 interface IState {
@@ -47,14 +47,14 @@ interface IState {
 	isLoading: boolean;
 }
 
-const QuestionAutosuggestMulti = Autosuggest as { new(): Autosuggest<ICatSection, ICatMy> };
+const QuestionAutosuggestMulti = Autosuggest as { new(): Autosuggest<IQuestionRow, ICatSection> };
 
 export class AutoSuggestQuestions extends React.Component<IProps, IState> {
 	// region Fields
 	state: IState;
 	isMob: boolean;
 	allCats: Map<string, ICat>;
-	searchQuestions: (filter: string, count: number) => Promise<ICat[]>;
+	searchQuestions: (filter: string, count: number) => Promise<IQuestionRow[]>;
 	debouncedLoadSuggestions: (value: string) => void;
 	//inputAutosuggest: React.RefObject<HTMLInputElement>;
 	// endregion region Constructor
@@ -150,19 +150,19 @@ export class AutoSuggestQuestions extends React.Component<IProps, IState> {
 		}
 		if (search.length < 3)
 			return [];
-		const catSection = new Map<string | null, ICat[]>();
+		const catSection = new Map<string | null, IQuestionRow[]>();
 		const questionKeys: IQuestionKey[] = [];
 		try {
 			console.log('--------->>>>> getSuggestions')
-			const questionRows: ICat[] = await this.searchQuestions(escapedValue, 10);
-			questionRows.forEach((questionRow: ICat) => {
+			const questionRows: IQuestionRow[] = await this.searchQuestions(escapedValue, 10);
+			questionRows.forEach((questionRow: IQuestionRow) => {
 				const { topId, parentId, id, title } = questionRow;
 				const questionKey = new QuestionKey(questionRow).questionKey!;
 				if (!questionKeys.includes(questionKey)) {
 					questionKeys.push(questionKey);
 
 					// 2) Group questions by parentId
-					const row: ICat = {
+					const row: IQuestionRow = {
 						topId,
 						parentId,
 						id,
@@ -242,9 +242,9 @@ export class AutoSuggestQuestions extends React.Component<IProps, IState> {
 
 			////////////////////////////////////////////////////////////
 			// 
-			let catSections: ICatSection[] = [];
+			const catSections: ICatSection[] = [];
 			catSection.forEach((quests, id) => {
-				let variationsss: string[] = [];
+				//let variationsss: string[] = [];
 				const catSection: ICatSection = {
 					id,
 					categoryTitle: '',
@@ -264,8 +264,7 @@ export class AutoSuggestQuestions extends React.Component<IProps, IState> {
 						alert(`${id} Not found in allCats`)
 					}
 				}
-				else {
-				}
+				
 				// const catSection: ICatSection = {
 				// 	id: id,
 				// 	categoryTitle: title,
@@ -303,7 +302,7 @@ export class AutoSuggestQuestions extends React.Component<IProps, IState> {
 			});
 			return catSections;
 		}
-		catch (error: any) {
+		catch (error: unknown) {
 			console.log(error)
 		};
 		return [];
@@ -317,8 +316,9 @@ export class AutoSuggestQuestions extends React.Component<IProps, IState> {
 		});
 	};
 
-	protected onSuggestionSelected(event: React.FormEvent<unknown>, data: Autosuggest.SuggestionSelectedEventData<ICat>): void {
-		const question: ICat = data.suggestion;
+	protected onSuggestionSelected(event: React.FormEvent<unknown>, data: Autosuggest.SuggestionSelectedEventData<IQuestionRow>): void {
+		console.log(event)
+		const question: IQuestionRow = data.suggestion;
 		const { topId, parentId, id} = question;
 		// alert(`Selected question is ${question.questionId} (${question.text}).`);
 		this.props.onSelectQuestion({ topId, parentId: parentId!, id }, this.state.value);
@@ -332,7 +332,7 @@ export class AutoSuggestQuestions extends React.Component<IProps, IState> {
 	*/
 
 	// TODO bac ovo u external css   style={{ textAlign: 'left'}}
-	protected renderSuggestion(suggestion: ICat, params: Autosuggest.RenderSuggestionParams): JSX.Element {
+	protected renderSuggestion(suggestion: IQuestionRow, params: Autosuggest.RenderSuggestionParams): JSX.Element {
 		// const className = params.isHighlighted ? "highlighted" : undefined;
 		//return <span className={className}>{suggestion.name}</span>;
 		const matches = AutosuggestHighlightMatch(suggestion.title, params.query);
@@ -352,7 +352,7 @@ export class AutoSuggestQuestions extends React.Component<IProps, IState> {
 	}
 
 	protected renderSectionTitle(section: ICatMy): JSX.Element {
-		const { parentCategoryUp, categoryParentTitle, categoryTitle } = section;
+		const { parentCategoryUp } = section; // , categoryParentTitle, categoryTitle
 		// let str = (categoryParentTitle ? (categoryParentTitle + " / ") : "") + categoryTitle;
 		// if (parentCategoryUp)
 		// 	str = " ... / " + str;
@@ -400,7 +400,8 @@ export class AutoSuggestQuestions extends React.Component<IProps, IState> {
 	// }
 	// endregion region Event handlers
 
-	protected onChange(event: /*React.ChangeEvent<HTMLInputElement>*/ React.FormEvent<any>, { newValue, method }: Autosuggest.ChangeEvent): void {
+	protected onChange(event: /*React.ChangeEvent<HTMLInputElement>*/ FormEvent<HTMLElement>, { newValue }: Autosuggest.ChangeEvent): void {
+		console.log(event)
 		this.setState({ value: newValue });
 	}
 
@@ -409,26 +410,18 @@ export class AutoSuggestQuestions extends React.Component<IProps, IState> {
 	// 	return { parentCategoryTitle: category.title, parentCategoryUp: '' };
 	// }
 
-	protected async onSuggestionsFetchRequested({ value }: any): Promise<void> {
+	protected async onSuggestionsFetchRequested({ value }: SuggestionsFetchRequestedParams): Promise<void> {
 		return /*await*/ this.debouncedLoadSuggestions(value);
-	}
-
-	private anyWord = (valueWordRegex: RegExp[], questionWords: string[]): boolean => {
-		for (let valWordRegex of valueWordRegex)
-			for (let questionWord of questionWords)
-				if (valWordRegex.test(questionWord))
-					return true;
-		return false;
 	}
 
 	////////////////////////////////////
 	// endregion region Helper methods
 
-	protected getSuggestionValue(suggestion: ICat) {
+	protected getSuggestionValue(suggestion: IQuestionRow) {
 		return suggestion.title;
 	}
 
-	protected getSectionSuggestions(section: ICatMy) {
+	protected getSectionSuggestions(section: ICatSection) {
 		return section.questionRows;
 	}
 

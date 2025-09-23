@@ -1,14 +1,14 @@
 import { useCallback, useState } from "react";
 import { Cat, Question, QuestionKey, type IAssignedAnswer, type ICat, type ICatDto, type IQuestion, type IQuestionDtoEx, type IQuestionEx, type IQuestionKey, type IQuestionRow, type IQuestionRowDto, type IQuestionRowDtosEx } from "../categories/types";
-import { HistoryDto, HistoryFilterDto, type IHistory, type IHistoryDto, type IHistoryDtoEx, type IHistoryFilter } from "../global/types";
+import { HistoryDto, HistoryFilterDto, type IHistory, type IHistoryFilter } from "../global/types";
 import { protectedResources } from "../authConfig";
 
 
-import type { IAuthUser, IChatBotAnswer, IGlobalState, INewQuestion, INextAnswer, USER_ANSWER_ACTION } from '../global/types';
+import type { IAuthUser, IChatBotAnswer, INewQuestion, INextAnswer, USER_ANSWER_ACTION } from '../global/types';
 
 class ChatBotAnswer {
   constructor(assignedAnswer: IAssignedAnswer) {
-    const { topId, id, answerTitle, answerLink, created, modified } = assignedAnswer;
+    const { topId, id, answerTitle, answerLink } = assignedAnswer;
     this.chatBotAnswer = {
       topId,
       id,
@@ -21,24 +21,24 @@ class ChatBotAnswer {
   chatBotAnswer: IChatBotAnswer
 }
 
-const initialGlobalState: IGlobalState = {
-  isAuthenticated: null,
-  ws: '',
-  everLoggedIn: false,
-  canAdd: false,
-  isOwner: false,
-  isDarkMode: true,
-  variant: '',
-  bg: ''
-}
+// const initialGlobalState: IGlobalState = {
+//   isAuthenticated: null,
+//   ws: '',
+//   everLoggedIn: false,
+//   canAdd: false,
+//   isOwner: false,
+//   isDarkMode: true,
+//   variant: '',
+//   bg: ''
+// }
 
 
 export const useData = (ws: string): [
   Map<string, ICat> | null, // allCats
   () => Promise<Map<string, ICat>>, // loadCats
   (questionKey: IQuestionKey) => Promise<IQuestionEx>, // getQuestion
-  IQuestion | null, // selectedQuestion
-  IChatBotAnswer | null, // firstAnswer
+  //IQuestion | null, // selectedQuestion
+  //IChatBotAnswer | null, // firstAnswer
   boolean, // hasMoreAnswers
   () => Promise<INextAnswer>, // getNextAnswer
   (filter: string, count: number) => Promise<IQuestionRow[]>, // searchQuestions
@@ -46,14 +46,14 @@ export const useData = (ws: string): [
   (underFilter: string) => Promise<void> // addHistoryFilter
 ] => {
 
-  const [globalState, setGlobalState] = useState<IGlobalState>(initialGlobalState);
-  const [authUser, setAuthUser] = useState<IAuthUser>({ nickName: '', name: '' });
+  // const [globalState, setGlobalState] = useState<IGlobalState>(initialGlobalState);
+  const [authUser] = useState<IAuthUser>({ nickName: 'Pera', name: 'DEMO' });
   const [workspace] = useState(ws);
   const [allCats, setAllCats] = useState<Map<string, ICat> | null>(null);
   const [newQuestion, setNewQuestion] = useState<INewQuestion | null>(null);
   const [selectedQuestion, setSelectedQuestion] = useState<IQuestion | null>(null);
   const [hasMoreAnswers, setHasMoreAnswers] = useState(false);
-  const [nextAnswer, setNextAnswer] = useState<IChatBotAnswer | null>(null);
+  // const [nextAnswer, setNextAnswer] = useState<IChatBotAnswer | null>(null);
   const [index, setIndex] = useState(-1);
 
   const Execute = async (method: string, endpoint: string, data: object | null = null): Promise<object> => {
@@ -146,7 +146,7 @@ export const useData = (ws: string): [
   const getQuestion = async (questionKey: IQuestionKey): Promise<IQuestionEx> => {
     return new Promise((resolve) => {
       try {
-        const { topId, id } = questionKey;
+        //const { topId, id } = questionKey;
         const query = new QuestionKey(questionKey).toQuery(workspace);
         const url = `${protectedResources.KnowledgeAPI.endpointQuestion}?${query}`;
         console.time();
@@ -208,6 +208,7 @@ export const useData = (ws: string): [
           .then((x: object) => {
             const dtosEx: IQuestionRowDtosEx = x as IQuestionRowDtosEx
             const { questionRowDtos, msg } = dtosEx;
+            console.log(msg);
             console.log('questionRowDtos:', { dtos: dtosEx }, protectedResources.KnowledgeAPI.endpointCategoryRow);
             console.timeEnd();
             if (questionRowDtos) {
@@ -290,6 +291,7 @@ export const useData = (ws: string): [
             const questionDtoEx: IQuestionDtoEx = x as IQuestionDtoEx;
             const { questionDto, msg } = questionDtoEx;
             console.timeEnd();
+            console.log(msg);
             if (questionDto) {
               //const history = new History(historyDto).history;
               console.log('History successfully created', { questionDto })
@@ -328,6 +330,7 @@ export const useData = (ws: string): [
         .then((x: object) => {
           const questionDtoEx: IQuestionDtoEx = x as IQuestionDtoEx;
           const { questionDto, msg } = questionDtoEx;
+          console.log(msg);
           console.timeEnd();
           if (questionDto) {
             //const history = new History(historyDto).history;
@@ -345,10 +348,15 @@ export const useData = (ws: string): [
   }, [workspace]);
 
   return [
-    allCats, loadCats,
-    getQuestion, selectedQuestion, hasMoreAnswers, getNextAnswer,
+    allCats, 
+    loadCats,
+    getQuestion, 
+    // selectedQuestion, 
+    hasMoreAnswers, 
+    getNextAnswer,
     searchQuestions,
-    addHistory, addHistoryFilter
+    addHistory, 
+    addHistoryFilter
   ]
   // useCallback(setNewQuestion, []), 
   // useCallback(getCurrQuestion, [question]), 

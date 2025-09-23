@@ -138,7 +138,7 @@ function App({ msalInstance }: { msalInstance: PublicClientApplication }) {
         </Offcanvas.Body>
       </Offcanvas> */}
 
-      <ChatBotDlg show={true} onHide={handleClose} />
+      <ChatBotDlg show={show} onHide={handleClose} />
     </>
   )
 }
