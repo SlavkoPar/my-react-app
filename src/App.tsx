@@ -7,8 +7,7 @@ import './categories/AutoSuggestQuestions.css'
 //import { Button, Offcanvas } from 'react-bootstrap'
 import Button from 'react-bootstrap/Button'
 // import { protectedResources } from "authConfig";
-import stamena from '/my-react-app/assets/Stamena.jpg';
-import stamena2 from 'https://slavkopar.github.io/my-react-app/assets/Stamena.jpg';
+import stamena2 from 'https://slavkopar.github.io/my-react-app/Stamena.jpg';
 import ChatBotDlg from './ChatBotDlg'
 //import { InteractionType, type PublicClientApplication } from '@azure/msal-browser'
 // import { useMsal, useMsalAuthentication } from '@azure/msal-react'
@@ -122,7 +121,6 @@ function App() {
         </a>
       </div> */}
       <div className="card p-1">
-        <img width="64" height="64" src={stamena2} alt="Chat" className='rounded mx-auto d-block' />
         <img width="64" height="64" src={stamena2} alt="Chat" hidden className='rounded mx-auto d-block' />
         <Button variant="primary" onClick={handleShow} className='my-1'>
           I am your buddy.
