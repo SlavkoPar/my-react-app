@@ -7,7 +7,8 @@ import './categories/AutoSuggestQuestions.css'
 //import { Button, Offcanvas } from 'react-bootstrap'
 import Button from 'react-bootstrap/Button'
 // import { protectedResources } from "authConfig";
-import stamena from 'https://slavkopar.github.io/my-react-app/assets/Stamena.jpg';
+import stamena from '/my-react-app/assets/Stamena.jpg';
+import stamena2 from 'https://slavkopar.github.io/my-react-app/assets/Stamena.jpg';
 import ChatBotDlg from './ChatBotDlg'
 //import { InteractionType, type PublicClientApplication } from '@azure/msal-browser'
 // import { useMsal, useMsalAuthentication } from '@azure/msal-react'
@@ -121,20 +122,15 @@ function App() {
         </a>
       </div> */}
       <div className="card p-1">
-
-        <img width="64" height="64" src={stamena} alt="Chat" className='rounded mx-auto d-block' />
+        <img width="64" height="64" src={stamena2} alt="Chat" className='rounded mx-auto d-block' />
         <Button variant="primary" onClick={handleShow} className='my-1'>
           I am your buddy.
         </Button>
-
         {/* <button onClick={() => setCount((count) => count + 1)}>
           count is {count}
         </button> */}
         {/*<p>Signed in as: {accounts[0]?.username}</p>*/}
       </div>
-
-
-
       {/* <Offcanvas show={show} onHide={handleClose} placement="end">
         <Offcanvas.Header closeButton>
           <Offcanvas.Title>Offcanvas Title</Offcanvas.Title>
