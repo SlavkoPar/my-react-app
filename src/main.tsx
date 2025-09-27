@@ -8,7 +8,6 @@ import App from './App.tsx'
 
 //const msalInstance = new PublicClientApplication(msalConfig);
 //await msalInstance.initialize();
-alert(document.getElementById('root'))
 createRoot(document.getElementById('root')!).render(
   <StrictMode>
       <App />
