@@ -170,7 +170,6 @@ const ChatBotDlg = ({ show, onHide }: IProps) => {
             //alert(questionEx.msg)
             return;
         }
-        console.log('Breeeeeeeeeeeeeeeeeeeeeeeeeeeeeee:', { question })
         if (question.numOfRelatedFilters > 0) {
             setAutoSuggestionValue(question.relatedFilters[0].filter)
         }
