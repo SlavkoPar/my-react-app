@@ -123,6 +123,7 @@ function App() {
       </div> */}
       <div className="card p-1">
         <img width="64" height="64" src={stamena2} alt="Chat" className='rounded mx-auto d-block' />
+        <img width="64" height="64" src={stamena2} alt="Chat" hidden className='rounded mx-auto d-block' />
         <Button variant="primary" onClick={handleShow} className='my-1'>
           I am your buddy.
         </Button>
