@@ -7,7 +7,7 @@ import './categories/AutoSuggestQuestions.css'
 //import { Button, Offcanvas } from 'react-bootstrap'
 import Button from 'react-bootstrap/Button'
 // import { protectedResources } from "authConfig";
-import stamena from '/stamena.jpg';
+import stamena from '/stamena.jpg'; 
 import ChatBotDlg from './ChatBotDlg'
 //import { InteractionType, type PublicClientApplication } from '@azure/msal-browser'
 // import { useMsal, useMsalAuthentication } from '@azure/msal-react'
