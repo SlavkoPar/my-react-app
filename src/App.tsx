@@ -7,7 +7,7 @@ import './categories/AutoSuggestQuestions.css'
 //import { Button, Offcanvas } from 'react-bootstrap'
 import Button from 'react-bootstrap/Button'
 // import { protectedResources } from "authConfig";
-import Stamena from './assets/Stamena.jpg';
+import stamena from 'https://slavkopar.github.io/my-react-app/assets/Stamena.jpg';
 import ChatBotDlg from './ChatBotDlg'
 //import { InteractionType, type PublicClientApplication } from '@azure/msal-browser'
 // import { useMsal, useMsalAuthentication } from '@azure/msal-react'
@@ -45,7 +45,7 @@ function App() {
 
 
 
-  
+
 
 
   //const { login, result, error } = useMsalAuthentication(InteractionType.Silent, silentRequest);
@@ -107,8 +107,8 @@ function App() {
   //const { accounts } = useMsal();
   //const myAccount: AccountInfo|null = getAccount(accountFilter): AccountInfo | null;
   //if (accounts.length === 0)
-    //if (!myAccount)
-    //return "Loading";
+  //if (!myAccount)
+  //return "Loading";
 
   return (
     <>
@@ -121,11 +121,11 @@ function App() {
         </a>
       </div> */}
       <div className="card p-1">
-        
-        <img width="64" height="64" src={Stamena} alt="Chat" className='rounded mx-auto d-block' />
+
+        <img width="64" height="64" src={stamena} alt="Chat" className='rounded mx-auto d-block' />
         <Button variant="primary" onClick={handleShow} className='my-1'>
-        I am your buddy.
-      </Button>
+          I am your buddy.
+        </Button>
 
         {/* <button onClick={() => setCount((count) => count + 1)}>
           count is {count}
@@ -133,7 +133,7 @@ function App() {
         {/*<p>Signed in as: {accounts[0]?.username}</p>*/}
       </div>
 
-      
+
 
       {/* <Offcanvas show={show} onHide={handleClose} placement="end">
         <Offcanvas.Header closeButton>
